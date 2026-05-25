@@ -2,13 +2,13 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Store, ClipboardList, ShoppingBasket, User } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 
-const items = [
+const items: { to: string; label: string; icon: any; badge?: boolean }[] = [
   { to: "/customer/home", label: "Trang chủ", icon: Home },
   { to: "/customer/favorites", label: "Sạp quen", icon: Store },
   { to: "/customer/orders", label: "Đơn hàng", icon: ClipboardList },
   { to: "/customer/cart", label: "Giỏ hàng", icon: ShoppingBasket, badge: true },
   { to: "/customer/profile", label: "Tài khoản", icon: User },
-] as const;
+];
 
 export function CustomerBottomNav() {
   const path = useRouterState({ select: s => s.location.pathname });
