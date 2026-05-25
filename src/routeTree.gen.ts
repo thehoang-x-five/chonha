@@ -15,14 +15,28 @@ import { Route as VendorProfileRouteImport } from './routes/vendor.profile'
 import { Route as VendorProductsRouteImport } from './routes/vendor.products'
 import { Route as VendorOrdersRouteImport } from './routes/vendor.orders'
 import { Route as VendorDashboardRouteImport } from './routes/vendor.dashboard'
+import { Route as DriverTripsRouteImport } from './routes/driver.trips'
+import { Route as DriverProfileRouteImport } from './routes/driver.profile'
+import { Route as DriverHomeRouteImport } from './routes/driver.home'
+import { Route as DriverEarningsRouteImport } from './routes/driver.earnings'
 import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
 import { Route as CustomerOrdersRouteImport } from './routes/customer.orders'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerFavoritesRouteImport } from './routes/customer.favorites'
 import { Route as CustomerCheckoutRouteImport } from './routes/customer.checkout'
 import { Route as CustomerCartRouteImport } from './routes/customer.cart'
+import { Route as AdminStallsRouteImport } from './routes/admin.stalls'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminMarketsRouteImport } from './routes/admin.markets'
+import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
+import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as VendorProductsNewRouteImport } from './routes/vendor.products.new'
 import { Route as VendorOrdersIdRouteImport } from './routes/vendor.orders.$id'
+import { Route as DriverTripsIdRouteImport } from './routes/driver.trips.$id'
 import { Route as CustomerStallsIdRouteImport } from './routes/customer.stalls.$id'
 import { Route as CustomerProductsIdRouteImport } from './routes/customer.products.$id'
 import { Route as CustomerMarketsIdRouteImport } from './routes/customer.markets.$id'
@@ -58,6 +72,26 @@ const VendorDashboardRoute = VendorDashboardRouteImport.update({
   path: '/vendor/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverTripsRoute = DriverTripsRouteImport.update({
+  id: '/driver/trips',
+  path: '/driver/trips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverProfileRoute = DriverProfileRouteImport.update({
+  id: '/driver/profile',
+  path: '/driver/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverHomeRoute = DriverHomeRouteImport.update({
+  id: '/driver/home',
+  path: '/driver/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverEarningsRoute = DriverEarningsRouteImport.update({
+  id: '/driver/earnings',
+  path: '/driver/earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomerProfileRoute = CustomerProfileRouteImport.update({
   id: '/customer/profile',
   path: '/customer/profile',
@@ -88,6 +122,51 @@ const CustomerCartRoute = CustomerCartRouteImport.update({
   path: '/customer/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStallsRoute = AdminStallsRouteImport.update({
+  id: '/admin/stalls',
+  path: '/admin/stalls',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/admin/products',
+  path: '/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/admin/orders',
+  path: '/admin/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMarketsRoute = AdminMarketsRouteImport.update({
+  id: '/admin/markets',
+  path: '/admin/markets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDriversRoute = AdminDriversRouteImport.update({
+  id: '/admin/drivers',
+  path: '/admin/drivers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDispatchRoute = AdminDispatchRouteImport.update({
+  id: '/admin/dispatch',
+  path: '/admin/dispatch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorProductsNewRoute = VendorProductsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -97,6 +176,11 @@ const VendorOrdersIdRoute = VendorOrdersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => VendorOrdersRoute,
+} as any)
+const DriverTripsIdRoute = DriverTripsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DriverTripsRoute,
 } as any)
 const CustomerStallsIdRoute = CustomerStallsIdRouteImport.update({
   id: '/customer/stalls/$id',
@@ -122,12 +206,25 @@ const CustomerOrdersIdTrackingRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/drivers': typeof AdminDriversRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stalls': typeof AdminStallsRoute
   '/customer/cart': typeof CustomerCartRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/home': typeof DriverHomeRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRouteWithChildren
   '/vendor/dashboard': typeof VendorDashboardRoute
   '/vendor/orders': typeof VendorOrdersRouteWithChildren
   '/vendor/products': typeof VendorProductsRouteWithChildren
@@ -136,18 +233,32 @@ export interface FileRoutesByFullPath {
   '/customer/markets/$id': typeof CustomerMarketsIdRoute
   '/customer/products/$id': typeof CustomerProductsIdRoute
   '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/drivers': typeof AdminDriversRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stalls': typeof AdminStallsRoute
   '/customer/cart': typeof CustomerCartRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/home': typeof DriverHomeRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRouteWithChildren
   '/vendor/dashboard': typeof VendorDashboardRoute
   '/vendor/orders': typeof VendorOrdersRouteWithChildren
   '/vendor/products': typeof VendorProductsRouteWithChildren
@@ -156,6 +267,7 @@ export interface FileRoutesByTo {
   '/customer/markets/$id': typeof CustomerMarketsIdRoute
   '/customer/products/$id': typeof CustomerProductsIdRoute
   '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
@@ -163,12 +275,25 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
+  '/admin/drivers': typeof AdminDriversRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stalls': typeof AdminStallsRoute
   '/customer/cart': typeof CustomerCartRoute
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/home': typeof DriverHomeRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRouteWithChildren
   '/vendor/dashboard': typeof VendorDashboardRoute
   '/vendor/orders': typeof VendorOrdersRouteWithChildren
   '/vendor/products': typeof VendorProductsRouteWithChildren
@@ -177,6 +302,7 @@ export interface FileRoutesById {
   '/customer/markets/$id': typeof CustomerMarketsIdRoute
   '/customer/products/$id': typeof CustomerProductsIdRoute
   '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
@@ -185,12 +311,25 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin/dashboard'
+    | '/admin/dispatch'
+    | '/admin/drivers'
+    | '/admin/markets'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/stalls'
     | '/customer/cart'
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
     | '/customer/orders'
     | '/customer/profile'
+    | '/driver/earnings'
+    | '/driver/home'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/vendor/dashboard'
     | '/vendor/orders'
     | '/vendor/products'
@@ -199,18 +338,32 @@ export interface FileRouteTypes {
     | '/customer/markets/$id'
     | '/customer/products/$id'
     | '/customer/stalls/$id'
+    | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
     | '/customer/orders/$id/tracking'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/dashboard'
+    | '/admin/dispatch'
+    | '/admin/drivers'
+    | '/admin/markets'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/stalls'
     | '/customer/cart'
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
     | '/customer/orders'
     | '/customer/profile'
+    | '/driver/earnings'
+    | '/driver/home'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/vendor/dashboard'
     | '/vendor/orders'
     | '/vendor/products'
@@ -219,18 +372,32 @@ export interface FileRouteTypes {
     | '/customer/markets/$id'
     | '/customer/products/$id'
     | '/customer/stalls/$id'
+    | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
     | '/customer/orders/$id/tracking'
   id:
     | '__root__'
     | '/'
+    | '/admin/dashboard'
+    | '/admin/dispatch'
+    | '/admin/drivers'
+    | '/admin/markets'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/stalls'
     | '/customer/cart'
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
     | '/customer/orders'
     | '/customer/profile'
+    | '/driver/earnings'
+    | '/driver/home'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/vendor/dashboard'
     | '/vendor/orders'
     | '/vendor/products'
@@ -239,6 +406,7 @@ export interface FileRouteTypes {
     | '/customer/markets/$id'
     | '/customer/products/$id'
     | '/customer/stalls/$id'
+    | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
     | '/customer/orders/$id/tracking'
@@ -246,12 +414,25 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDispatchRoute: typeof AdminDispatchRoute
+  AdminDriversRoute: typeof AdminDriversRoute
+  AdminMarketsRoute: typeof AdminMarketsRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStallsRoute: typeof AdminStallsRoute
   CustomerCartRoute: typeof CustomerCartRoute
   CustomerCheckoutRoute: typeof CustomerCheckoutRoute
   CustomerFavoritesRoute: typeof CustomerFavoritesRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
   CustomerOrdersRoute: typeof CustomerOrdersRouteWithChildren
   CustomerProfileRoute: typeof CustomerProfileRoute
+  DriverEarningsRoute: typeof DriverEarningsRoute
+  DriverHomeRoute: typeof DriverHomeRoute
+  DriverProfileRoute: typeof DriverProfileRoute
+  DriverTripsRoute: typeof DriverTripsRouteWithChildren
   VendorDashboardRoute: typeof VendorDashboardRoute
   VendorOrdersRoute: typeof VendorOrdersRouteWithChildren
   VendorProductsRoute: typeof VendorProductsRouteWithChildren
@@ -306,6 +487,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver/trips': {
+      id: '/driver/trips'
+      path: '/driver/trips'
+      fullPath: '/driver/trips'
+      preLoaderRoute: typeof DriverTripsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/profile': {
+      id: '/driver/profile'
+      path: '/driver/profile'
+      fullPath: '/driver/profile'
+      preLoaderRoute: typeof DriverProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/home': {
+      id: '/driver/home'
+      path: '/driver/home'
+      fullPath: '/driver/home'
+      preLoaderRoute: typeof DriverHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/earnings': {
+      id: '/driver/earnings'
+      path: '/driver/earnings'
+      fullPath: '/driver/earnings'
+      preLoaderRoute: typeof DriverEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/customer/profile': {
       id: '/customer/profile'
       path: '/customer/profile'
@@ -348,6 +557,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerCartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/stalls': {
+      id: '/admin/stalls'
+      path: '/admin/stalls'
+      fullPath: '/admin/stalls'
+      preLoaderRoute: typeof AdminStallsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/admin/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/admin/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/markets': {
+      id: '/admin/markets'
+      path: '/admin/markets'
+      fullPath: '/admin/markets'
+      preLoaderRoute: typeof AdminMarketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/drivers': {
+      id: '/admin/drivers'
+      path: '/admin/drivers'
+      fullPath: '/admin/drivers'
+      preLoaderRoute: typeof AdminDriversRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dispatch': {
+      id: '/admin/dispatch'
+      path: '/admin/dispatch'
+      fullPath: '/admin/dispatch'
+      preLoaderRoute: typeof AdminDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor/products/new': {
       id: '/vendor/products/new'
       path: '/new'
@@ -361,6 +633,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vendor/orders/$id'
       preLoaderRoute: typeof VendorOrdersIdRouteImport
       parentRoute: typeof VendorOrdersRoute
+    }
+    '/driver/trips/$id': {
+      id: '/driver/trips/$id'
+      path: '/$id'
+      fullPath: '/driver/trips/$id'
+      preLoaderRoute: typeof DriverTripsIdRouteImport
+      parentRoute: typeof DriverTripsRoute
     }
     '/customer/stalls/$id': {
       id: '/customer/stalls/$id'
@@ -405,6 +684,18 @@ const CustomerOrdersRouteWithChildren = CustomerOrdersRoute._addFileChildren(
   CustomerOrdersRouteChildren,
 )
 
+interface DriverTripsRouteChildren {
+  DriverTripsIdRoute: typeof DriverTripsIdRoute
+}
+
+const DriverTripsRouteChildren: DriverTripsRouteChildren = {
+  DriverTripsIdRoute: DriverTripsIdRoute,
+}
+
+const DriverTripsRouteWithChildren = DriverTripsRoute._addFileChildren(
+  DriverTripsRouteChildren,
+)
+
 interface VendorOrdersRouteChildren {
   VendorOrdersIdRoute: typeof VendorOrdersIdRoute
 }
@@ -431,12 +722,25 @@ const VendorProductsRouteWithChildren = VendorProductsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminDispatchRoute: AdminDispatchRoute,
+  AdminDriversRoute: AdminDriversRoute,
+  AdminMarketsRoute: AdminMarketsRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminStallsRoute: AdminStallsRoute,
   CustomerCartRoute: CustomerCartRoute,
   CustomerCheckoutRoute: CustomerCheckoutRoute,
   CustomerFavoritesRoute: CustomerFavoritesRoute,
   CustomerHomeRoute: CustomerHomeRoute,
   CustomerOrdersRoute: CustomerOrdersRouteWithChildren,
   CustomerProfileRoute: CustomerProfileRoute,
+  DriverEarningsRoute: DriverEarningsRoute,
+  DriverHomeRoute: DriverHomeRoute,
+  DriverProfileRoute: DriverProfileRoute,
+  DriverTripsRoute: DriverTripsRouteWithChildren,
   VendorDashboardRoute: VendorDashboardRoute,
   VendorOrdersRoute: VendorOrdersRouteWithChildren,
   VendorProductsRoute: VendorProductsRouteWithChildren,
@@ -449,3 +753,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
