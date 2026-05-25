@@ -76,7 +76,7 @@ function Page() {
           <section className="mt-5">
             <h3 className="text-sm font-semibold">Cách sơ chế</h3>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              {product.prepOptions.map(o => (
+              {product.prepOptions.map((o: string) => (
                 <button key={o} onClick={() => setPrep(o)} className={`rounded-2xl border px-3 py-2.5 text-sm font-medium ${prep === o ? "border-primary bg-primary/10 text-primary" : "bg-card"}`}>{o}</button>
               ))}
             </div>

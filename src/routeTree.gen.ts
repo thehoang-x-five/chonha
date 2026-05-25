@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
+import { Route as CustomerOrdersRouteImport } from './routes/customer.orders'
+import { Route as CustomerHomeRouteImport } from './routes/customer.home'
+import { Route as CustomerFavoritesRouteImport } from './routes/customer.favorites'
+import { Route as CustomerCheckoutRouteImport } from './routes/customer.checkout'
+import { Route as CustomerCartRouteImport } from './routes/customer.cart'
+import { Route as CustomerStallsIdRouteImport } from './routes/customer.stalls.$id'
+import { Route as CustomerProductsIdRouteImport } from './routes/customer.products.$id'
+import { Route as CustomerMarketsIdRouteImport } from './routes/customer.markets.$id'
+import { Route as CustomerOrdersIdTrackingRouteImport } from './routes/customer.orders.$id.tracking'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerProfileRoute = CustomerProfileRouteImport.update({
+  id: '/customer/profile',
+  path: '/customer/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerOrdersRoute = CustomerOrdersRouteImport.update({
+  id: '/customer/orders',
+  path: '/customer/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerHomeRoute = CustomerHomeRouteImport.update({
+  id: '/customer/home',
+  path: '/customer/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerFavoritesRoute = CustomerFavoritesRouteImport.update({
+  id: '/customer/favorites',
+  path: '/customer/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerCheckoutRoute = CustomerCheckoutRouteImport.update({
+  id: '/customer/checkout',
+  path: '/customer/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerCartRoute = CustomerCartRouteImport.update({
+  id: '/customer/cart',
+  path: '/customer/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerStallsIdRoute = CustomerStallsIdRouteImport.update({
+  id: '/customer/stalls/$id',
+  path: '/customer/stalls/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerProductsIdRoute = CustomerProductsIdRouteImport.update({
+  id: '/customer/products/$id',
+  path: '/customer/products/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerMarketsIdRoute = CustomerMarketsIdRouteImport.update({
+  id: '/customer/markets/$id',
+  path: '/customer/markets/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerOrdersIdTrackingRoute =
+  CustomerOrdersIdTrackingRouteImport.update({
+    id: '/$id/tracking',
+    path: '/$id/tracking',
+    getParentRoute: () => CustomerOrdersRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/customer/cart': typeof CustomerCartRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/favorites': typeof CustomerFavoritesRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/orders': typeof CustomerOrdersRouteWithChildren
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/markets/$id': typeof CustomerMarketsIdRoute
+  '/customer/products/$id': typeof CustomerProductsIdRoute
+  '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/customer/cart': typeof CustomerCartRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/favorites': typeof CustomerFavoritesRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/orders': typeof CustomerOrdersRouteWithChildren
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/markets/$id': typeof CustomerMarketsIdRoute
+  '/customer/products/$id': typeof CustomerProductsIdRoute
+  '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/customer/cart': typeof CustomerCartRoute
+  '/customer/checkout': typeof CustomerCheckoutRoute
+  '/customer/favorites': typeof CustomerFavoritesRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/orders': typeof CustomerOrdersRouteWithChildren
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/markets/$id': typeof CustomerMarketsIdRoute
+  '/customer/products/$id': typeof CustomerProductsIdRoute
+  '/customer/stalls/$id': typeof CustomerStallsIdRoute
+  '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/customer/cart'
+    | '/customer/checkout'
+    | '/customer/favorites'
+    | '/customer/home'
+    | '/customer/orders'
+    | '/customer/profile'
+    | '/customer/markets/$id'
+    | '/customer/products/$id'
+    | '/customer/stalls/$id'
+    | '/customer/orders/$id/tracking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/customer/cart'
+    | '/customer/checkout'
+    | '/customer/favorites'
+    | '/customer/home'
+    | '/customer/orders'
+    | '/customer/profile'
+    | '/customer/markets/$id'
+    | '/customer/products/$id'
+    | '/customer/stalls/$id'
+    | '/customer/orders/$id/tracking'
+  id:
+    | '__root__'
+    | '/'
+    | '/customer/cart'
+    | '/customer/checkout'
+    | '/customer/favorites'
+    | '/customer/home'
+    | '/customer/orders'
+    | '/customer/profile'
+    | '/customer/markets/$id'
+    | '/customer/products/$id'
+    | '/customer/stalls/$id'
+    | '/customer/orders/$id/tracking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CustomerCartRoute: typeof CustomerCartRoute
+  CustomerCheckoutRoute: typeof CustomerCheckoutRoute
+  CustomerFavoritesRoute: typeof CustomerFavoritesRoute
+  CustomerHomeRoute: typeof CustomerHomeRoute
+  CustomerOrdersRoute: typeof CustomerOrdersRouteWithChildren
+  CustomerProfileRoute: typeof CustomerProfileRoute
+  CustomerMarketsIdRoute: typeof CustomerMarketsIdRoute
+  CustomerProductsIdRoute: typeof CustomerProductsIdRoute
+  CustomerStallsIdRoute: typeof CustomerStallsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer/profile': {
+      id: '/customer/profile'
+      path: '/customer/profile'
+      fullPath: '/customer/profile'
+      preLoaderRoute: typeof CustomerProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/orders': {
+      id: '/customer/orders'
+      path: '/customer/orders'
+      fullPath: '/customer/orders'
+      preLoaderRoute: typeof CustomerOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/home': {
+      id: '/customer/home'
+      path: '/customer/home'
+      fullPath: '/customer/home'
+      preLoaderRoute: typeof CustomerHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/favorites': {
+      id: '/customer/favorites'
+      path: '/customer/favorites'
+      fullPath: '/customer/favorites'
+      preLoaderRoute: typeof CustomerFavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/checkout': {
+      id: '/customer/checkout'
+      path: '/customer/checkout'
+      fullPath: '/customer/checkout'
+      preLoaderRoute: typeof CustomerCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/cart': {
+      id: '/customer/cart'
+      path: '/customer/cart'
+      fullPath: '/customer/cart'
+      preLoaderRoute: typeof CustomerCartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/stalls/$id': {
+      id: '/customer/stalls/$id'
+      path: '/customer/stalls/$id'
+      fullPath: '/customer/stalls/$id'
+      preLoaderRoute: typeof CustomerStallsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/products/$id': {
+      id: '/customer/products/$id'
+      path: '/customer/products/$id'
+      fullPath: '/customer/products/$id'
+      preLoaderRoute: typeof CustomerProductsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/markets/$id': {
+      id: '/customer/markets/$id'
+      path: '/customer/markets/$id'
+      fullPath: '/customer/markets/$id'
+      preLoaderRoute: typeof CustomerMarketsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer/orders/$id/tracking': {
+      id: '/customer/orders/$id/tracking'
+      path: '/$id/tracking'
+      fullPath: '/customer/orders/$id/tracking'
+      preLoaderRoute: typeof CustomerOrdersIdTrackingRouteImport
+      parentRoute: typeof CustomerOrdersRoute
+    }
   }
 }
 
+interface CustomerOrdersRouteChildren {
+  CustomerOrdersIdTrackingRoute: typeof CustomerOrdersIdTrackingRoute
+}
+
+const CustomerOrdersRouteChildren: CustomerOrdersRouteChildren = {
+  CustomerOrdersIdTrackingRoute: CustomerOrdersIdTrackingRoute,
+}
+
+const CustomerOrdersRouteWithChildren = CustomerOrdersRoute._addFileChildren(
+  CustomerOrdersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CustomerCartRoute: CustomerCartRoute,
+  CustomerCheckoutRoute: CustomerCheckoutRoute,
+  CustomerFavoritesRoute: CustomerFavoritesRoute,
+  CustomerHomeRoute: CustomerHomeRoute,
+  CustomerOrdersRoute: CustomerOrdersRouteWithChildren,
+  CustomerProfileRoute: CustomerProfileRoute,
+  CustomerMarketsIdRoute: CustomerMarketsIdRoute,
+  CustomerProductsIdRoute: CustomerProductsIdRoute,
+  CustomerStallsIdRoute: CustomerStallsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

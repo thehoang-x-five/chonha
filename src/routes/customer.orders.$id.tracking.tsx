@@ -34,7 +34,7 @@ function Page() {
     return () => clearTimeout(t);
   }, [status]);
 
-  const stallIds = Array.from(new Set(initial.items.map(i => i.stallId)));
+  const stallIds = Array.from(new Set<string>(initial.items.map((i: any) => i.stallId)));
   const pickedCount = status === "picking" ? 2 : status === "delivering" || status === "completed" ? stallIds.length : 0;
 
   return (
@@ -89,7 +89,7 @@ function Page() {
       <div className="mx-4 mt-3 rounded-2xl border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sản phẩm</p>
         <ul className="mt-2 space-y-1 text-sm">
-          {initial.items.map(it => {
+          {initial.items.map((it: any) => {
             const p = getProduct(it.productId)!;
             return <li key={it.productId} className="flex justify-between"><span>{p.name} × {it.qty}</span><span className="font-medium">{formatVnd(p.price * it.qty)}</span></li>;
           })}

@@ -51,7 +51,7 @@ function Page() {
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          {stall.badges.map(b => (
+          {stall.badges.map((b: string) => (
             <span key={b} className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
               <Award className="h-3 w-3" /> {b}
             </span>
