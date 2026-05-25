@@ -20,7 +20,7 @@ export function CustomerBottomNav() {
           const active = path === to;
           return (
             <li key={to}>
-              <Link to={to} className={`tap-target flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
+              <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
                 <span className="relative">
                   <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
                   {badge && count > 0 && (
@@ -54,7 +54,7 @@ export function VendorBottomNav() {
           const active = path === to;
           return (
             <li key={to}>
-              <Link to={to} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
+              <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
                 <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
                 {label}
               </Link>
@@ -82,7 +82,7 @@ export function DriverBottomNav() {
           const active = path === to;
           return (
             <li key={to}>
-              <Link to={to} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
+              <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
                 {label}
               </Link>
