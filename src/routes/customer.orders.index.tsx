@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/cards";
 import { orders, getMarket, getProduct, formatVnd, type Order } from "@/lib/mock-data";
 import { StatusBadge, orderStatusLabel } from "@/components/status-badge";
 
-export const Route = createFileRoute("/customer/orders")({ component: Page });
+export const Route = createFileRoute("/customer/orders/")({ component: Page });
 
 const tabs = [
   { id: "active", label: "Đang giao", match: (o: Order) => !["completed","cancelled"].includes(o.status) },
