@@ -20,7 +20,6 @@ import { Route as DriverProfileRouteImport } from './routes/driver.profile'
 import { Route as DriverHomeRouteImport } from './routes/driver.home'
 import { Route as DriverEarningsRouteImport } from './routes/driver.earnings'
 import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
-import { Route as CustomerOrdersRouteImport } from './routes/customer.orders'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerFavoritesRouteImport } from './routes/customer.favorites'
 import { Route as CustomerCheckoutRouteImport } from './routes/customer.checkout'
@@ -34,6 +33,7 @@ import { Route as AdminMarketsRouteImport } from './routes/admin.markets'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as CustomerOrdersIndexRouteImport } from './routes/customer.orders.index'
 import { Route as VendorProductsNewRouteImport } from './routes/vendor.products.new'
 import { Route as VendorOrdersIdRouteImport } from './routes/vendor.orders.$id'
 import { Route as DriverTripsIdRouteImport } from './routes/driver.trips.$id'
@@ -95,11 +95,6 @@ const DriverEarningsRoute = DriverEarningsRouteImport.update({
 const CustomerProfileRoute = CustomerProfileRouteImport.update({
   id: '/customer/profile',
   path: '/customer/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerOrdersRoute = CustomerOrdersRouteImport.update({
-  id: '/customer/orders',
-  path: '/customer/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CustomerHomeRoute = CustomerHomeRouteImport.update({
@@ -167,6 +162,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerOrdersIndexRoute = CustomerOrdersIndexRouteImport.update({
+  id: '/customer/orders/',
+  path: '/customer/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorProductsNewRoute = VendorProductsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -199,9 +199,9 @@ const CustomerMarketsIdRoute = CustomerMarketsIdRouteImport.update({
 } as any)
 const CustomerOrdersIdTrackingRoute =
   CustomerOrdersIdTrackingRouteImport.update({
-    id: '/$id/tracking',
-    path: '/$id/tracking',
-    getParentRoute: () => CustomerOrdersRoute,
+    id: '/customer/orders/$id/tracking',
+    path: '/customer/orders/$id/tracking',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -219,7 +219,6 @@ export interface FileRoutesByFullPath {
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
-  '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/home': typeof DriverHomeRoute
@@ -236,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
+  '/customer/orders/': typeof CustomerOrdersIndexRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRoutesByTo {
@@ -253,7 +253,6 @@ export interface FileRoutesByTo {
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
-  '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/home': typeof DriverHomeRoute
@@ -270,6 +269,7 @@ export interface FileRoutesByTo {
   '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
+  '/customer/orders': typeof CustomerOrdersIndexRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRoutesById {
@@ -288,7 +288,6 @@ export interface FileRoutesById {
   '/customer/checkout': typeof CustomerCheckoutRoute
   '/customer/favorites': typeof CustomerFavoritesRoute
   '/customer/home': typeof CustomerHomeRoute
-  '/customer/orders': typeof CustomerOrdersRouteWithChildren
   '/customer/profile': typeof CustomerProfileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/home': typeof DriverHomeRoute
@@ -305,6 +304,7 @@ export interface FileRoutesById {
   '/driver/trips/$id': typeof DriverTripsIdRoute
   '/vendor/orders/$id': typeof VendorOrdersIdRoute
   '/vendor/products/new': typeof VendorProductsNewRoute
+  '/customer/orders/': typeof CustomerOrdersIndexRoute
   '/customer/orders/$id/tracking': typeof CustomerOrdersIdTrackingRoute
 }
 export interface FileRouteTypes {
@@ -324,7 +324,6 @@ export interface FileRouteTypes {
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
-    | '/customer/orders'
     | '/customer/profile'
     | '/driver/earnings'
     | '/driver/home'
@@ -341,6 +340,7 @@ export interface FileRouteTypes {
     | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
+    | '/customer/orders/'
     | '/customer/orders/$id/tracking'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -358,7 +358,6 @@ export interface FileRouteTypes {
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
-    | '/customer/orders'
     | '/customer/profile'
     | '/driver/earnings'
     | '/driver/home'
@@ -375,6 +374,7 @@ export interface FileRouteTypes {
     | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
+    | '/customer/orders'
     | '/customer/orders/$id/tracking'
   id:
     | '__root__'
@@ -392,7 +392,6 @@ export interface FileRouteTypes {
     | '/customer/checkout'
     | '/customer/favorites'
     | '/customer/home'
-    | '/customer/orders'
     | '/customer/profile'
     | '/driver/earnings'
     | '/driver/home'
@@ -409,6 +408,7 @@ export interface FileRouteTypes {
     | '/driver/trips/$id'
     | '/vendor/orders/$id'
     | '/vendor/products/new'
+    | '/customer/orders/'
     | '/customer/orders/$id/tracking'
   fileRoutesById: FileRoutesById
 }
@@ -427,7 +427,6 @@ export interface RootRouteChildren {
   CustomerCheckoutRoute: typeof CustomerCheckoutRoute
   CustomerFavoritesRoute: typeof CustomerFavoritesRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
-  CustomerOrdersRoute: typeof CustomerOrdersRouteWithChildren
   CustomerProfileRoute: typeof CustomerProfileRoute
   DriverEarningsRoute: typeof DriverEarningsRoute
   DriverHomeRoute: typeof DriverHomeRoute
@@ -441,6 +440,8 @@ export interface RootRouteChildren {
   CustomerMarketsIdRoute: typeof CustomerMarketsIdRoute
   CustomerProductsIdRoute: typeof CustomerProductsIdRoute
   CustomerStallsIdRoute: typeof CustomerStallsIdRoute
+  CustomerOrdersIndexRoute: typeof CustomerOrdersIndexRoute
+  CustomerOrdersIdTrackingRoute: typeof CustomerOrdersIdTrackingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -520,13 +521,6 @@ declare module '@tanstack/react-router' {
       path: '/customer/profile'
       fullPath: '/customer/profile'
       preLoaderRoute: typeof CustomerProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer/orders': {
-      id: '/customer/orders'
-      path: '/customer/orders'
-      fullPath: '/customer/orders'
-      preLoaderRoute: typeof CustomerOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/customer/home': {
@@ -620,6 +614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer/orders/': {
+      id: '/customer/orders/'
+      path: '/customer/orders'
+      fullPath: '/customer/orders/'
+      preLoaderRoute: typeof CustomerOrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor/products/new': {
       id: '/vendor/products/new'
       path: '/new'
@@ -664,25 +665,13 @@ declare module '@tanstack/react-router' {
     }
     '/customer/orders/$id/tracking': {
       id: '/customer/orders/$id/tracking'
-      path: '/$id/tracking'
+      path: '/customer/orders/$id/tracking'
       fullPath: '/customer/orders/$id/tracking'
       preLoaderRoute: typeof CustomerOrdersIdTrackingRouteImport
-      parentRoute: typeof CustomerOrdersRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface CustomerOrdersRouteChildren {
-  CustomerOrdersIdTrackingRoute: typeof CustomerOrdersIdTrackingRoute
-}
-
-const CustomerOrdersRouteChildren: CustomerOrdersRouteChildren = {
-  CustomerOrdersIdTrackingRoute: CustomerOrdersIdTrackingRoute,
-}
-
-const CustomerOrdersRouteWithChildren = CustomerOrdersRoute._addFileChildren(
-  CustomerOrdersRouteChildren,
-)
 
 interface DriverTripsRouteChildren {
   DriverTripsIdRoute: typeof DriverTripsIdRoute
@@ -735,7 +724,6 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerCheckoutRoute: CustomerCheckoutRoute,
   CustomerFavoritesRoute: CustomerFavoritesRoute,
   CustomerHomeRoute: CustomerHomeRoute,
-  CustomerOrdersRoute: CustomerOrdersRouteWithChildren,
   CustomerProfileRoute: CustomerProfileRoute,
   DriverEarningsRoute: DriverEarningsRoute,
   DriverHomeRoute: DriverHomeRoute,
@@ -749,7 +737,19 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerMarketsIdRoute: CustomerMarketsIdRoute,
   CustomerProductsIdRoute: CustomerProductsIdRoute,
   CustomerStallsIdRoute: CustomerStallsIdRoute,
+  CustomerOrdersIndexRoute: CustomerOrdersIndexRoute,
+  CustomerOrdersIdTrackingRoute: CustomerOrdersIdTrackingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
