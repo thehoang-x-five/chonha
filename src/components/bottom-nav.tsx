@@ -48,14 +48,14 @@ const vendorItems = [
 export function VendorBottomNav() {
   const path = useRouterState({ select: s => s.location.pathname });
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 bg-card/95 backdrop-blur safe-bottom">
       <ul className="mx-auto grid max-w-md grid-cols-5">
         {vendorItems.map(({ to, label, icon: Icon }) => {
           const active = path === to;
           return (
             <li key={to}>
-              <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
-                <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
+              <Link to={to as any} className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[13px] font-bold ${active ? "text-primary" : "text-muted-foreground"}`}>
+                <Icon className="h-7 w-7" strokeWidth={active ? 2.6 : 2} />
                 {label}
               </Link>
             </li>
