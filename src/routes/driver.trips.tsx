@@ -1,50 +1,71 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { DriverBottomNav } from "@/components/bottom-nav";
-import { formatVnd } from "@/lib/mock-data";
-import { MapPin, Navigation, Package } from "lucide-react";
+import { EmptyState } from "@/components/cards";
+import { StatusBadge } from "@/components/status-badge";
+import { formatVnd, orders, getMarket } from "@/lib/mock-data";
+import { Package, MapPin, ChevronRight, CheckCircle2, Inbox } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/driver/trips")({ component: Page });
 
+const tabs = [
+  { key: "active", label: "Đang chạy" },
+  { key: "done", label: "Đã giao" },
+] as const;
+
 function Page() {
-  const [show, setShow] = useState(true);
+  const [tab, setTab] = useState<typeof tabs[number]["key"]>("active");
+  const active = orders.filter(o => ["picking", "delivering"].includes(o.status));
+  // For demo, treat 'o1' as active
+  const list = tab === "active" ? (active.length ? active : [orders[0]]) : orders.filter(o => o.status === "completed");
+
   return (
     <MobileShell nav={<DriverBottomNav />}>
       <AppHeader title="Cuốc giao" />
-      <div className="px-4 pt-3 space-y-3">
-        {show && (
-          <div className="rounded-2xl border-2 border-primary bg-primary/5 p-4">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">Cuốc mới</span>
-              <span className="text-xs font-bold text-secondary">15s</span>
-            </div>
-            <div className="mt-3 space-y-2 text-sm">
-              <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-success" /><div><p className="font-bold">Lấy tại Chợ Tân Mỹ</p><p className="text-xs text-muted-foreground">Cách bạn 0.8 km · 3 gian hàng</p></div></div>
-              <div className="flex items-start gap-2"><Navigation className="mt-0.5 h-4 w-4 text-info" /><div><p className="font-bold">Giao tới Sunrise City, Q.7</p><p className="text-xs text-muted-foreground">Tổng quãng đường 3.5 km</p></div></div>
-            </div>
-            <div className="mt-3 rounded-xl bg-card p-3 text-center">
-              <p className="text-xs text-muted-foreground">Thu nhập dự kiến</p>
-              <p className="text-2xl font-extrabold text-primary">{formatVnd(32000)}</p>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <Link to="/driver/trips/$id" params={{ id: "o4" }} onClick={() => setShow(false)} className="rounded-2xl bg-primary py-3 text-center text-sm font-bold text-primary-foreground">Nhận cuốc</Link>
-              <button onClick={() => setShow(false)} className="rounded-2xl border bg-card py-3 text-sm font-bold">Bỏ qua</button>
-            </div>
-          </div>
-        )}
 
-        <p className="pt-2 text-sm font-bold">Cuốc đang chạy</p>
-        <Link to="/driver/trips/$id" params={{ id: "o1" }} className="block rounded-2xl border bg-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary"><Package className="h-6 w-6" /></div>
-            <div className="flex-1">
-              <p className="font-bold">Đơn #CNM-2410001</p>
-              <p className="text-xs text-muted-foreground">3 sạp · Chợ Tân Mỹ → Q.7</p>
-            </div>
-            <span className="rounded-full bg-info/15 px-2.5 py-1 text-xs font-bold text-info">Đang lấy</span>
-          </div>
-        </Link>
+      <div className="sticky top-14 z-20 border-b bg-card/95 px-4 backdrop-blur">
+        <div className="flex gap-1 py-2">
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} className={`flex-1 rounded-full px-3 py-2 text-sm font-semibold transition ${tab === t.key ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3 px-4 pt-3">
+        {list.length === 0 && (
+          <EmptyState icon={Inbox} title="Chưa có cuốc giao" description="Khi có cuốc mới, hệ thống sẽ báo cho bạn." />
+        )}
+        {list.map(o => {
+          const m = getMarket(o.marketId)!;
+          const stallCount = new Set(o.items.map(i => i.stallId)).size;
+          const done = o.status === "completed";
+          return (
+            <Link key={o.id} to="/driver/trips/$id" params={{ id: o.id }} className="block">
+              <div className="rounded-2xl border bg-card p-4 shadow-sm transition active:scale-[0.99]">
+                <div className="flex items-center gap-3">
+                  <div className={`grid h-12 w-12 place-items-center rounded-xl ${done ? "bg-success/15 text-success" : "bg-primary/15 text-primary"}`}>
+                    {done ? <CheckCircle2 className="h-6 w-6" /> : <Package className="h-6 w-6" />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate font-bold">#{o.code}</p>
+                      <span className="text-sm font-extrabold text-primary">{formatVnd(28000)}</span>
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{stallCount} sạp · {m.name}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t pt-2 text-xs">
+                  <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-3 w-3" />{o.address}</span>
+                  {done ? <StatusBadge variant="success">Hoàn tất</StatusBadge> : <StatusBadge variant="info">Đang chạy</StatusBadge>}
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </MobileShell>
   );
