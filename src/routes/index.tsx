@@ -33,7 +33,7 @@ function Welcome() {
     await authService.loginAsRole(role);
     navigate({ to });
   };
-
+  return (
     <div className="mx-auto min-h-screen max-w-md bg-gradient-to-b from-accent/40 via-background to-background safe-top">
       <div className="px-6 pt-10">
         <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ function Welcome() {
             />
           </div>
           <button
-            onClick={() => setOtpSent(true)}
+            onClick={sendOtp}
             className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground active:scale-[0.98]"
           >
             {otpSent ? "Đã gửi mã OTP (demo)" : "Gửi mã OTP"}
@@ -70,7 +70,7 @@ function Welcome() {
 
         <div className="mt-3 grid gap-3">
           {roles.map(r => (
-            <Link key={r.to} to={r.to} className={`flex items-center gap-3 rounded-2xl border bg-gradient-to-r ${r.color} p-4 transition active:scale-[0.98]`}>
+            <button key={r.to} onClick={() => pickRole(r.role, r.to)} className={`flex items-center gap-3 rounded-2xl border bg-gradient-to-r ${r.color} p-4 text-left transition active:scale-[0.98]`}>
               <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl ${r.iconBg}`}>
                 <r.icon className="h-6 w-6" />
               </div>
@@ -78,7 +78,7 @@ function Welcome() {
                 <p className="font-semibold">{r.label}</p>
                 <p className="text-xs text-muted-foreground">{r.desc}</p>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
 
