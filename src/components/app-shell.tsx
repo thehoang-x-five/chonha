@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { ReactNode } from "react";
+import { RoleGuard } from "@/components/common/RoleGuard";
+import type { AppArea } from "@/lib/permissions";
 
 export function AppHeader({ title, back, right, subtitle, sticky = true }: { title: string; subtitle?: string; back?: string | true; right?: ReactNode; sticky?: boolean }) {
   return (
