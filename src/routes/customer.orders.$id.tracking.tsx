@@ -22,10 +22,14 @@ export const Route = createFileRoute("/customer/orders/$id/tracking")({
 
 const flow: Order["status"][] = ["confirmed","preparing","finding_driver","picking","delivering","completed"];
 const etaByStatus: Record<Order["status"], string> = {
+  pending: "≈ 50 phút",
   confirmed: "≈ 45 phút",
   preparing: "≈ 35 phút",
+  ready_for_pickup: "≈ 30 phút",
   finding_driver: "≈ 30 phút",
+  driver_assigned: "≈ 25 phút",
   picking: "≈ 20 phút",
+  picking_up: "≈ 18 phút",
   delivering: "≈ 8 phút",
   completed: "Đã giao",
   cancelled: "Đã huỷ",
