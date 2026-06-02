@@ -24,4 +24,12 @@ export interface Stall {
   yearsInMarket: number;
   badges: string[];
   approvalStatus?: StallApprovalStatus;
+  /** @deprecated legacy alias for `ownerName` — kept for not-yet-migrated UI */
+  owner?: string;
+  /** @deprecated legacy alias for `isOpen` */
+  open?: boolean;
+  /** @deprecated legacy alias for `description` */
+  specialty?: string;
+  /** @deprecated legacy alias for `yearsInMarket` */
+  yearsActive?: number;
 }
