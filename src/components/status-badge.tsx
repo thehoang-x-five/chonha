@@ -18,10 +18,14 @@ export function StatusBadge({ variant = "muted", children, className }: { varian
 
 import type { Order } from "@/lib/mock-data";
 export const orderStatusLabel: Record<Order["status"], { label: string; variant: Variant }> = {
+  pending: { label: "Chờ xác nhận", variant: "muted" },
   confirmed: { label: "Đã xác nhận", variant: "info" },
   preparing: { label: "Đang chuẩn bị", variant: "warning" },
+  ready_for_pickup: { label: "Sẵn sàng giao", variant: "warning" },
   finding_driver: { label: "Tìm tài xế", variant: "warning" },
+  driver_assigned: { label: "Đã có tài xế", variant: "info" },
   picking: { label: "Lấy hàng tại chợ", variant: "info" },
+  picking_up: { label: "Tài xế đang lấy hàng", variant: "info" },
   delivering: { label: "Đang giao", variant: "info" },
   completed: { label: "Đã hoàn tất", variant: "success" },
   cancelled: { label: "Đã hủy", variant: "destructive" },

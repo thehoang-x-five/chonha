@@ -1,23 +1,38 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingBasket, Store, Bike, ShieldCheck, Phone, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { authService } from "@/services/authService";
+import { isValidPhone } from "@/lib/validators";
+import type { UserRole } from "@/types/user.types";
 
 export const Route = createFileRoute("/")({
   component: Welcome,
   head: () => ({ meta: [{ title: "Chợ Nhà Mình – Đi chợ tươi mỗi ngày" }] }),
 });
 
-const roles = [
-  { to: "/customer/home", label: "Vào vai Khách hàng", desc: "Đi chợ, đặt hàng giao tận nhà", icon: ShoppingBasket, color: "from-primary/20 to-primary/5", iconBg: "bg-primary text-primary-foreground" },
-  { to: "/vendor/dashboard", label: "Vào vai Chủ gian hàng", desc: "Quản lý sạp & nhận đơn", icon: Store, color: "from-secondary/20 to-secondary/5", iconBg: "bg-secondary text-secondary-foreground" },
-  { to: "/driver/home", label: "Vào vai Tài xế", desc: "Nhận cuốc giao hàng", icon: Bike, color: "from-info/20 to-info/5", iconBg: "bg-info text-info-foreground" },
-  { to: "/admin/dashboard", label: "Vào vai Admin", desc: "Quản trị nền tảng", icon: ShieldCheck, color: "from-warning/30 to-warning/5", iconBg: "bg-foreground text-background" },
-] as const;
+const roles: { to: string; role: UserRole; label: string; desc: string; icon: typeof ShoppingBasket; color: string; iconBg: string }[] = [
+  { to: "/customer/home", role: "customer", label: "Vào vai Khách hàng", desc: "Đi chợ, đặt hàng giao tận nhà", icon: ShoppingBasket, color: "from-primary/20 to-primary/5", iconBg: "bg-primary text-primary-foreground" },
+  { to: "/vendor/dashboard", role: "vendor", label: "Vào vai Chủ gian hàng", desc: "Quản lý sạp & nhận đơn", icon: Store, color: "from-secondary/20 to-secondary/5", iconBg: "bg-secondary text-secondary-foreground" },
+  { to: "/driver/home", role: "driver", label: "Vào vai Tài xế", desc: "Nhận cuốc giao hàng", icon: Bike, color: "from-info/20 to-info/5", iconBg: "bg-info text-info-foreground" },
+  { to: "/admin/dashboard", role: "admin", label: "Vào vai Admin", desc: "Quản trị nền tảng", icon: ShieldCheck, color: "from-warning/30 to-warning/5", iconBg: "bg-foreground text-background" },
+];
 
 function Welcome() {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const navigate = useNavigate();
 
+  const sendOtp = async () => {
+    if (!isValidPhone(phone)) { toast.error("Số điện thoại không hợp lệ"); return; }
+    try { await authService.requestOtp(phone); setOtpSent(true); toast.success("Đã gửi mã OTP (demo: 1234)"); }
+    catch (e) { toast.error((e as Error).message); }
+  };
+
+  const pickRole = async (role: UserRole, to: string) => {
+    await authService.loginAsRole(role);
+    navigate({ to });
+  };
   return (
     <div className="mx-auto min-h-screen max-w-md bg-gradient-to-b from-accent/40 via-background to-background safe-top">
       <div className="px-6 pt-10">
@@ -42,7 +57,7 @@ function Welcome() {
             />
           </div>
           <button
-            onClick={() => setOtpSent(true)}
+            onClick={sendOtp}
             className="mt-3 h-12 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground active:scale-[0.98]"
           >
             {otpSent ? "Đã gửi mã OTP (demo)" : "Gửi mã OTP"}
@@ -55,7 +70,7 @@ function Welcome() {
 
         <div className="mt-3 grid gap-3">
           {roles.map(r => (
-            <Link key={r.to} to={r.to} className={`flex items-center gap-3 rounded-2xl border bg-gradient-to-r ${r.color} p-4 transition active:scale-[0.98]`}>
+            <button key={r.to} onClick={() => pickRole(r.role, r.to)} className={`flex items-center gap-3 rounded-2xl border bg-gradient-to-r ${r.color} p-4 text-left transition active:scale-[0.98]`}>
               <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl ${r.iconBg}`}>
                 <r.icon className="h-6 w-6" />
               </div>
@@ -63,7 +78,7 @@ function Welcome() {
                 <p className="font-semibold">{r.label}</p>
                 <p className="text-xs text-muted-foreground">{r.desc}</p>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
 

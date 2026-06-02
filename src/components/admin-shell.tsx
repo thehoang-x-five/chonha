@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Store, ShoppingBag, Package, ClipboardList, Users, Route as RouteIcon, BarChart3, Settings, Menu, X, Search, Bell, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { RoleGuard } from "@/components/common/RoleGuard";
 
 const items = [
   { to: "/admin/dashboard", label: "Tổng quan", icon: LayoutDashboard },
@@ -18,6 +19,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
   const path = useRouterState({ select: s => s.location.pathname });
   const [open, setOpen] = useState(false);
   return (
+    <RoleGuard area="admin">
     <div className="min-h-screen bg-muted/30">
       {/* Mobile top */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-card px-3 lg:hidden">
@@ -95,5 +97,6 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
         </main>
       </div>
     </div>
+    </RoleGuard>
   );
 }
