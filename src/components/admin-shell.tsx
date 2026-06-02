@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Store, ShoppingBag, Package, ClipboardList, Users, Route as RouteIcon, BarChart3, Settings, Menu, X, Search, Bell, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { RoleGuard } from "@/components/common/RoleGuard";
 
 const items = [
   { to: "/admin/dashboard", label: "Tổng quan", icon: LayoutDashboard },
