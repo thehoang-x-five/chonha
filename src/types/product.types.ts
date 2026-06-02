@@ -13,4 +13,10 @@ export interface Product {
   freshnessNote?: string;
   isAvailable: boolean;
   preparationOptions: string[];
+  /** @deprecated legacy alias for `isAvailable` */
+  inStock?: boolean;
+  /** @deprecated legacy alias for `freshnessNote` */
+  freshNote?: string;
+  /** @deprecated legacy alias for `preparationOptions` */
+  prepOptions?: string[];
 }
