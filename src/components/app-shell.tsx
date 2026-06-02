@@ -23,13 +23,14 @@ export function AppHeader({ title, back, right, subtitle, sticky = true }: { tit
   );
 }
 
-export function MobileShell({ children, nav, padBottom = true }: { children: ReactNode; nav?: ReactNode; padBottom?: boolean }) {
+export function MobileShell({ children, nav, padBottom = true, area }: { children: ReactNode; nav?: ReactNode; padBottom?: boolean; area?: AppArea }) {
   // Key off the pathname so each navigation re-triggers the enter animation.
   const path = useRouterState({ select: s => s.location.pathname });
-  return (
+  const inner = (
     <div className="mx-auto min-h-dvh max-w-md bg-background safe-x">
       <div key={path} className={`page-enter ${padBottom ? "pb-nav" : ""}`}>{children}</div>
       {nav}
     </div>
   );
+  return area ? <RoleGuard area={area}>{inner}</RoleGuard> : inner;
 }

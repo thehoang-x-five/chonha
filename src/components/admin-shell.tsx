@@ -18,6 +18,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
   const path = useRouterState({ select: s => s.location.pathname });
   const [open, setOpen] = useState(false);
   return (
+    <RoleGuard area="admin">
     <div className="min-h-screen bg-muted/30">
       {/* Mobile top */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-card px-3 lg:hidden">
@@ -95,5 +96,6 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
         </main>
       </div>
     </div>
+    </RoleGuard>
   );
 }
