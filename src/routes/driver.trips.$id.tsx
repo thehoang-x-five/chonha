@@ -288,7 +288,7 @@ function DeliverSection({ order, delivered, onOpenOtp }: any) {
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <a href={`tel:${order.customerPhone}`} className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary py-3 text-sm font-bold text-primary-foreground"><Phone className="h-4 w-4" /> Gọi khách</a>
-          <button onClick={() => toast("Đã mở khung chat (demo)")} className="flex items-center justify-center gap-1.5 rounded-2xl border bg-card py-3 text-sm font-bold"><MessageCircle className="h-4 w-4" /> Nhắn tin</button>
+          <button onClick={() => notifyTodo("Nhắn tin khách")} className="flex items-center justify-center gap-1.5 rounded-2xl border bg-card py-3 text-sm font-bold"><MessageCircle className="h-4 w-4" /> Nhắn tin</button>
         </div>
       </div>
 
