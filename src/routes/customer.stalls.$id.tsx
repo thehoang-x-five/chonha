@@ -1,10 +1,13 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Phone, MessageCircle, Heart, Star, Award, ShieldCheck } from "lucide-react";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Phone, MessageCircle, Heart, Star, Award } from "lucide-react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { CustomerBottomNav } from "@/components/bottom-nav";
 import { ProductCard } from "@/components/cards";
 import { getStall, getMarket, getProductsByStall } from "@/lib/mock-data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { stallService } from "@/services/stallService";
+import { notifyTodo } from "@/lib/notify";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/customer/stalls/$id")({
   component: Page,
@@ -22,7 +25,18 @@ function Page() {
   const market = getMarket(stall.marketId)!;
   const allProducts = getProductsByStall(stall.id);
   const [f, setF] = useState("Tất cả");
+  const [following, setFollowing] = useState<boolean>(() => stallService.isFollowed(stall.id));
   const products = f === "Tất cả" ? allProducts : allProducts.filter(p => p.name.toLowerCase().includes(f.toLowerCase()));
+
+  useEffect(() => { setFollowing(stallService.isFollowed(stall.id)); }, [stall.id]);
+
+  const toggleFollow = async () => {
+    try {
+      if (following) { await stallService.unfollowStall(stall.id); toast.success("Đã bỏ theo dõi sạp"); }
+      else { await stallService.followStall(stall.id); toast.success(`Đã theo dõi ${stall.name}`); }
+      setFollowing(!following);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Lỗi"); }
+  };
 
   return (
     <MobileShell nav={<CustomerBottomNav />}>
