@@ -29,9 +29,15 @@ function Page() {
   );
 
   return (
-    <MobileShell nav={<CustomerBottomNav />}>
-      <AppHeader title={market.name} back="/customer/home" right={<button className="tap-target grid place-items-center"><Heart className="h-5 w-5" /></button>} />
+    <MobileShell nav={<CustomerBottomNav />} area="customer">
+      <AppHeader title={market.name} back="/customer/home" right={<button aria-label="Yêu thích" className="tap-target grid place-items-center"><Heart className="h-5 w-5" /></button>} />
       <div className="grid h-40 place-items-center bg-gradient-to-br from-primary/15 to-secondary/15 text-7xl">{market.cover}</div>
+      {market.status !== "open" && (
+        <div className="mx-4 mt-3 rounded-2xl border-2 border-warning/40 bg-warning/15 p-3 text-sm">
+          <p className="font-bold">{market.status === "closing" ? "⚠️ Chợ sắp đóng cửa" : "🚫 Chợ đang đóng cửa"}</p>
+          <p className="text-xs text-muted-foreground">Bạn có thể xem sạp và lên đơn, đơn sẽ được xử lý khi chợ mở lại.</p>
+        </div>
+      )}
       <div className="px-4 pt-4">
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-warning text-warning" />{market.rating}</span>

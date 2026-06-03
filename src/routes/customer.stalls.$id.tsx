@@ -1,10 +1,13 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Phone, MessageCircle, Heart, Star, Award, ShieldCheck } from "lucide-react";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Phone, MessageCircle, Heart, Star, Award } from "lucide-react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { CustomerBottomNav } from "@/components/bottom-nav";
 import { ProductCard } from "@/components/cards";
 import { getStall, getMarket, getProductsByStall } from "@/lib/mock-data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { stallService } from "@/services/stallService";
+import { notifyTodo } from "@/lib/notify";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/customer/stalls/$id")({
   component: Page,
@@ -22,11 +25,26 @@ function Page() {
   const market = getMarket(stall.marketId)!;
   const allProducts = getProductsByStall(stall.id);
   const [f, setF] = useState("Tất cả");
+  const [following, setFollowing] = useState<boolean>(() => stallService.isFollowed(stall.id));
   const products = f === "Tất cả" ? allProducts : allProducts.filter(p => p.name.toLowerCase().includes(f.toLowerCase()));
 
+  useEffect(() => { setFollowing(stallService.isFollowed(stall.id)); }, [stall.id]);
+
+  const toggleFollow = async () => {
+    try {
+      if (following) { await stallService.unfollowStall(stall.id); toast.success("Đã bỏ theo dõi sạp"); }
+      else { await stallService.followStall(stall.id); toast.success(`Đã theo dõi ${stall.name}`); }
+      setFollowing(!following);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Lỗi"); }
+  };
+
   return (
-    <MobileShell nav={<CustomerBottomNav />}>
-      <AppHeader title={stall.name} back={`/customer/markets/${stall.marketId}` as any} right={<button className="tap-target grid place-items-center"><Heart className="h-5 w-5" /></button>} />
+    <MobileShell nav={<CustomerBottomNav />} area="customer">
+      <AppHeader title={stall.name} back={`/customer/markets/${stall.marketId}` as any} right={
+        <button onClick={toggleFollow} aria-label={following ? "Bỏ theo dõi" : "Theo dõi"} className="tap-target grid place-items-center">
+          <Heart className={`h-5 w-5 ${following ? "fill-destructive text-destructive" : ""}`} />
+        </button>
+      } />
 
       <div className="grid h-44 place-items-center bg-gradient-to-br from-secondary/20 to-primary/15 text-7xl">{stall.cover}</div>
 
@@ -40,9 +58,11 @@ function Page() {
         </div>
 
         <div className="mt-3 flex items-center gap-2">
-          <button className="flex-1 rounded-2xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground">Theo dõi sạp</button>
-          <button className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><Phone className="h-4 w-4" /></button>
-          <button className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><MessageCircle className="h-4 w-4" /></button>
+          <button onClick={toggleFollow} className={`flex-1 rounded-2xl px-3 py-2.5 text-sm font-semibold ${following ? "border bg-card" : "bg-primary text-primary-foreground"}`}>
+            {following ? "Đang theo dõi" : "Theo dõi sạp"}
+          </button>
+          <button onClick={() => notifyTodo("Gọi điện sạp")} className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><Phone className="h-4 w-4" /></button>
+          <button onClick={() => notifyTodo("Nhắn tin sạp")} className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><MessageCircle className="h-4 w-4" /></button>
         </div>
 
         <div className="mt-3 flex items-center gap-3 text-xs">

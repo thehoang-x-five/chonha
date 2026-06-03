@@ -1,32 +1,64 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { DriverBottomNav } from "@/components/bottom-nav";
 import { MapPlaceholder, KPIStatCard } from "@/components/cards";
-import { formatVnd } from "@/lib/mock-data";
-import { Zap, MapPin, Navigation, Package, Star, TrendingUp } from "lucide-react";
+import { formatVnd, getMarket } from "@/lib/mock-data";
+import { Zap, MapPin, Navigation, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { deliveryService } from "@/services/deliveryService";
+import { loadJSON, saveJSON, STORAGE_KEYS } from "@/lib/storage";
+import type { Order } from "@/types/order.types";
 
 export const Route = createFileRoute("/driver/home")({ component: Page });
 
-function Page() {
-  const [online, setOnline] = useState(true);
-  const [incoming, setIncoming] = useState(false);
-  const [countdown, setCountdown] = useState(15);
+const DRIVER_ID = "d1";
 
-  // Simulate incoming order after going online
+function Page() {
+  const [online, setOnline] = useState<boolean>(() => loadJSON<boolean>(STORAGE_KEYS.driverOnline, true));
+  const [incoming, setIncoming] = useState<Order | null>(null);
+  const [countdown, setCountdown] = useState(15);
+  const [busy, setBusy] = useState(false);
+  const nav = useNavigate();
+
+  useEffect(() => { saveJSON(STORAGE_KEYS.driverOnline, online); }, [online]);
+
   useEffect(() => {
-    if (!online) { setIncoming(false); return; }
-    const t = setTimeout(() => setIncoming(true), 1500);
+    if (!online) { setIncoming(null); return; }
+    const t = setTimeout(async () => {
+      try { const o = await deliveryService.getAvailableTripForDriver(DRIVER_ID); setIncoming(o); }
+      catch { /* ignore */ }
+    }, 1200);
     return () => clearTimeout(t);
   }, [online]);
 
   useEffect(() => {
     if (!incoming) { setCountdown(15); return; }
-    if (countdown <= 0) { setIncoming(false); toast.error("Đã bỏ lỡ cuốc giao"); return; }
-    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    if (countdown <= 0) { setIncoming(null); toast.error("Đã bỏ lỡ cuốc giao"); return; }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [incoming, countdown]);
+
+  const accept = async () => {
+    if (!incoming) return;
+    setBusy(true);
+    try {
+      await deliveryService.acceptTrip(DRIVER_ID, incoming.id);
+      toast.success("Đã nhận cuốc, bắt đầu đi đến chợ");
+      const id = incoming.id;
+      setIncoming(null);
+      nav({ to: "/driver/trips/$id", params: { id } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Không nhận được cuốc");
+    } finally { setBusy(false); }
+  };
+
+  const decline = async () => {
+    if (!incoming) return;
+    try { await deliveryService.declineTrip(incoming.id, DRIVER_ID); } catch { /* ignore */ }
+    toast("Đã bỏ qua cuốc");
+    setIncoming(null);
+  };
 
   return (
     <MobileShell nav={<DriverBottomNav />}>
@@ -96,38 +128,42 @@ function Page() {
               <span className="grid h-12 w-12 place-items-center rounded-full border-4 border-primary text-base font-extrabold text-primary">{countdown}</span>
             </div>
 
-            <div className="mt-3 rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/10 p-3 text-center">
-              <p className="text-xs text-muted-foreground">Thu nhập dự kiến</p>
-              <p className="text-3xl font-extrabold text-primary">{formatVnd(32000)}</p>
-              <p className="text-[11px] text-muted-foreground">Khoảng cách 3.5 km · 3 sạp · ~25 phút</p>
-            </div>
-
-            <ul className="mt-3 space-y-2 text-sm">
-              <li className="flex items-start gap-2 rounded-xl border bg-card p-2.5">
-                <MapPin className="mt-0.5 h-4 w-4 text-success" />
-                <div className="flex-1">
-                  <p className="font-bold">Chợ Tân Mỹ</p>
-                  <p className="text-xs text-muted-foreground">Cách bạn 0.8 km · 3 gian hàng cần lấy</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-2 rounded-xl border bg-card p-2.5">
-                <Navigation className="mt-0.5 h-4 w-4 text-info" />
-                <div className="flex-1">
-                  <p className="font-bold">Sunrise City, Q.7</p>
-                  <p className="text-xs text-muted-foreground">Giao tận nhà · 2.7 km từ chợ</p>
-                </div>
-              </li>
-            </ul>
+            {(() => {
+              const market = getMarket(incoming.marketId);
+              const stallCount = new Set(incoming.items.map((i) => i.stallId)).size;
+              const earnings = Math.max(25000, Math.round(incoming.deliveryFee * 0.85));
+              return (
+                <>
+                  <div className="mt-3 rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/10 p-3 text-center">
+                    <p className="text-xs text-muted-foreground">Thu nhập dự kiến</p>
+                    <p className="text-3xl font-extrabold text-primary">{formatVnd(earnings)}</p>
+                    <p className="text-[11px] text-muted-foreground">{stallCount} sạp · ~25 phút</p>
+                  </div>
+                  <ul className="mt-3 space-y-2 text-sm">
+                    <li className="flex items-start gap-2 rounded-xl border bg-card p-2.5">
+                      <MapPin className="mt-0.5 h-4 w-4 text-success" />
+                      <div className="flex-1">
+                        <p className="font-bold">{market?.name ?? "Chợ"}</p>
+                        <p className="text-xs text-muted-foreground">{stallCount} gian hàng cần lấy</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2 rounded-xl border bg-card p-2.5">
+                      <Navigation className="mt-0.5 h-4 w-4 text-info" />
+                      <div className="flex-1">
+                        <p className="font-bold">{incoming.address}</p>
+                        <p className="text-xs text-muted-foreground">Giao cho {incoming.customer}</p>
+                      </div>
+                    </li>
+                  </ul>
+                </>
+              );
+            })()}
 
             <div className="mt-3 grid grid-cols-3 gap-2">
-              <button onClick={() => { setIncoming(false); toast("Đã bỏ qua cuốc"); }} className="rounded-2xl border bg-card py-3 text-sm font-bold">Bỏ qua</button>
-              <Link
-                to="/driver/trips/$id" params={{ id: "o4" }}
-                onClick={() => { setIncoming(false); toast.success("Đã nhận cuốc, bắt đầu đi đến chợ"); }}
-                className="col-span-2 rounded-2xl bg-primary py-3 text-center text-sm font-extrabold text-primary-foreground shadow"
-              >
-                Nhận cuốc · {countdown}s
-              </Link>
+              <button onClick={decline} className="rounded-2xl border bg-card py-3 text-sm font-bold">Bỏ qua</button>
+              <button onClick={accept} disabled={busy} className="col-span-2 rounded-2xl bg-primary py-3 text-center text-sm font-extrabold text-primary-foreground shadow disabled:opacity-50">
+                {busy ? "Đang nhận…" : `Nhận cuốc · ${countdown}s`}
+              </button>
             </div>
           </div>
         </div>

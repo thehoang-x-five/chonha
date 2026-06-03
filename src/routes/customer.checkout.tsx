@@ -1,9 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { MapPin, Phone, Wallet, Banknote, Building2, Pencil, ShieldCheck, Sparkles, ChevronRight } from "lucide-react";
+import { MapPin, Wallet, Banknote, Building2, Pencil, ShieldCheck, Sparkles } from "lucide-react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { useCart, cart } from "@/lib/cart-store";
 import { formatVnd, getMarket, getStall, getProduct } from "@/lib/mock-data";
+import { useAuth } from "@/hooks/useAuth";
+import { useAddresses } from "@/hooks/useAddresses";
+import { orderService } from "@/services/orderService";
+import { validateAddress } from "@/lib/validators";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -20,24 +24,30 @@ const times = [
   { id: "schedule", label: "Hẹn 17:30 hôm nay", hint: "Đặt giờ", emoji: "📅" },
 ];
 const pays = [
-  { id: "cash", label: "Tiền mặt khi nhận", hint: "Phổ biến nhất", icon: Banknote },
-  { id: "bank", label: "Chuyển khoản", hint: "VietQR · Vietcombank", icon: Building2 },
-  { id: "wallet", label: "Ví Momo / ZaloPay", hint: "Demo", icon: Wallet },
-];
+  { id: "cod", label: "Tiền mặt khi nhận", hint: "Phổ biến nhất", icon: Banknote },
+  { id: "vnpay", label: "Chuyển khoản (VietQR)", hint: "Vietcombank", icon: Building2 },
+  { id: "momo", label: "Ví Momo / ZaloPay", hint: "Demo", icon: Wallet },
+] as const;
 
 function Page() {
   const { items, subtotal, stallGroups, marketId } = useCart();
   const market = marketId ? getMarket(marketId) : null;
   const nav = useNavigate();
+  const { user } = useAuth();
+  const { data: addresses, defaultAddress } = useAddresses();
+  const [addressId, setAddressId] = useState<string | null>(defaultAddress?.id ?? null);
   const [time, setTime] = useState("asap");
-  const [pay, setPay] = useState("cash");
+  const [pay, setPay] = useState<typeof pays[number]["id"]>("cod");
   const [note, setNote] = useState("");
   const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   if (items.length === 0) {
     nav({ to: "/customer/cart" });
     return null;
   }
+
+  const selectedAddr = addresses.find((a) => a.id === addressId) ?? defaultAddress ?? addresses[0];
 
   const deliveryFeeBase = market?.deliveryFeeFrom ?? 18000;
   const deliveryFee = subtotal >= FREE_SHIP ? 0 : deliveryFeeBase;
@@ -45,27 +55,54 @@ function Page() {
   const total = subtotal + deliveryFee + serviceFee;
   const stallCount = Object.keys(stallGroups).length;
 
-  const place = () => {
-    setConfirm(false);
-    toast.success("Đặt hàng thành công!", { description: `Đơn từ ${market?.name} đang được các sạp chuẩn bị.` });
-    cart.clear();
-    nav({ to: "/customer/orders/$id/tracking", params: { id: "o5" } });
+  const place = async () => {
+    if (!selectedAddr) { toast.error("Vui lòng chọn địa chỉ giao hàng"); return; }
+    const v = validateAddress(selectedAddr.address);
+    if (!v.ok) { toast.error(v.message); return; }
+    setBusy(true);
+    try {
+      const order = await orderService.createOrder({
+        marketId: marketId!,
+        customerId: user?.id ?? "u-customer",
+        customerName: selectedAddr.fullName,
+        customerPhone: selectedAddr.phone,
+        deliveryAddress: selectedAddr.address,
+        paymentMethod: pay,
+        items: items.map((it) => ({ productId: it.productId, stallId: it.stallId, qty: it.qty, prep: it.prep, note: it.note })),
+        note,
+      });
+      setConfirm(false);
+      cart.clear();
+      toast.success("Đặt hàng thành công!", { description: `Đơn ${order.code} đang được các sạp chuẩn bị.` });
+      nav({ to: "/customer/orders/$id/tracking", params: { id: order.id } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Không tạo được đơn");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <MobileShell padBottom={false}>
+    <MobileShell padBottom={false} area="customer">
       <AppHeader title="Xác nhận đơn" back="/customer/cart" />
       <div className="space-y-3 px-4 pb-36 pt-3">
-        {/* Address */}
+        {/* Address selector */}
         <section className="rounded-2xl border bg-card p-3 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"><MapPin className="h-4 w-4" /></div>
-            <div className="flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Giao đến</p>
-              <p className="text-sm font-bold">Chị Mai · 0909 123 456</p>
-              <p className="text-xs text-muted-foreground">112 Nguyễn Thị Thập, P. Tân Phú, Q.7, TP.HCM</p>
-            </div>
-            <button className="inline-flex items-center gap-1 text-xs font-bold text-primary"><Pencil className="h-3 w-3" /> Đổi</button>
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Giao đến</p>
+            <button onClick={() => toast("Mở Tài khoản → Địa chỉ để chỉnh sửa")} className="inline-flex items-center gap-1 text-xs font-bold text-primary"><Pencil className="h-3 w-3" /> Quản lý</button>
+          </div>
+          <div className="space-y-2">
+            {addresses.map((a) => (
+              <label key={a.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${selectedAddr?.id === a.id ? "border-primary bg-primary/5" : ""}`}>
+                <input type="radio" checked={selectedAddr?.id === a.id} onChange={() => setAddressId(a.id)} className="mt-1 h-4 w-4 accent-[color:var(--primary)]" />
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1 text-sm font-bold"><MapPin className="h-3.5 w-3.5 text-primary" />{a.label}{a.isDefault && <span className="ml-1 rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">Mặc định</span>}</p>
+                  <p className="text-xs">{a.fullName} · {a.phone}</p>
+                  <p className="truncate text-xs text-muted-foreground">{a.address}</p>
+                </div>
+              </label>
+            ))}
           </div>
         </section>
 
@@ -153,8 +190,8 @@ function Page() {
       </div>
 
       <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2 border-t bg-card p-3 safe-bottom shadow-[0_-8px_24px_rgba(0,0,0,0.06)]">
-        <button onClick={() => setConfirm(true)} className="flex h-14 w-full items-center justify-between rounded-2xl bg-primary px-5 text-base font-extrabold text-primary-foreground active:scale-[0.98]">
-          <span>Đặt đơn ngay</span>
+        <button onClick={() => setConfirm(true)} disabled={busy} className="flex h-14 w-full items-center justify-between rounded-2xl bg-primary px-5 text-base font-extrabold text-primary-foreground active:scale-[0.98] disabled:opacity-50">
+          <span>{busy ? "Đang đặt đơn…" : "Đặt đơn ngay"}</span>
           <span>{formatVnd(total)}</span>
         </button>
       </div>
@@ -169,7 +206,7 @@ function Page() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Xem lại</AlertDialogCancel>
-            <AlertDialogAction onClick={place}>Đặt đơn</AlertDialogAction>
+            <AlertDialogAction onClick={place} disabled={busy}>Đặt đơn</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

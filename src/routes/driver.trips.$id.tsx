@@ -3,11 +3,13 @@ import { useState } from "react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { MapPlaceholder } from "@/components/cards";
 import { orders, getStall, getMarket, getProduct, formatVnd } from "@/lib/mock-data";
-import { Phone, MessageCircle, Check, AlertTriangle, Navigation, MapPin, Store, User, Package, ShieldCheck, X } from "lucide-react";
+import { Phone, MessageCircle, Check, AlertTriangle, Navigation, MapPin, Store, Package, ShieldCheck } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { deliveryService } from "@/services/deliveryService";
+import { notifyTodo } from "@/lib/notify";
 
 export const Route = createFileRoute("/driver/trips/$id")({
   component: Page,
@@ -41,11 +43,22 @@ function Page() {
     });
   };
 
-  const confirmOtp = () => {
-    if (otp.length < 4) { toast.error("Mã OTP gồm 4 chữ số"); return; }
-    setDelivered(true);
-    setOtpOpen(false);
-    toast.success("Đã giao hàng thành công 🎉");
+  const confirmOtp = async () => {
+    try {
+      await deliveryService.confirmDelivery(order.id, otp);
+      setDelivered(true);
+      setOtpOpen(false);
+      toast.success("Đã giao hàng thành công 🎉");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Mã OTP chưa đúng");
+    }
+  };
+
+  const reportIssue = async (reason: string) => {
+    try { await deliveryService.reportIssue(order.id, reason); }
+    catch { /* ignore */ }
+    setIssueOpen(false);
+    toast.success("Đã gửi báo cáo, tổng đài sẽ gọi bạn");
   };
 
   return (
@@ -131,7 +144,7 @@ function Page() {
               { label: "Không tìm thấy địa chỉ", desc: "Địa chỉ giao hàng không chính xác" },
               { label: "Sự cố khác", desc: "Mô tả với tổng đài" },
             ].map(i => (
-              <button key={i.label} onClick={() => { setIssueOpen(false); toast.success("Đã gửi báo cáo, tổng đài sẽ gọi bạn"); }} className="flex w-full items-start gap-3 rounded-2xl border p-3 text-left transition hover:bg-accent">
+              <button key={i.label} onClick={() => reportIssue(i.label)} className="flex w-full items-start gap-3 rounded-2xl border p-3 text-left transition hover:bg-accent">
                 <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
                 <div>
                   <p className="font-semibold">{i.label}</p>
@@ -275,7 +288,7 @@ function DeliverSection({ order, delivered, onOpenOtp }: any) {
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <a href={`tel:${order.customerPhone}`} className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary py-3 text-sm font-bold text-primary-foreground"><Phone className="h-4 w-4" /> Gọi khách</a>
-          <button onClick={() => toast("Đã mở khung chat (demo)")} className="flex items-center justify-center gap-1.5 rounded-2xl border bg-card py-3 text-sm font-bold"><MessageCircle className="h-4 w-4" /> Nhắn tin</button>
+          <button onClick={() => notifyTodo("Nhắn tin khách")} className="flex items-center justify-center gap-1.5 rounded-2xl border bg-card py-3 text-sm font-bold"><MessageCircle className="h-4 w-4" /> Nhắn tin</button>
         </div>
       </div>
 
