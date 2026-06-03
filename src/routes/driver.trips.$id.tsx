@@ -43,11 +43,22 @@ function Page() {
     });
   };
 
-  const confirmOtp = () => {
-    if (otp.length < 4) { toast.error("Mã OTP gồm 4 chữ số"); return; }
-    setDelivered(true);
-    setOtpOpen(false);
-    toast.success("Đã giao hàng thành công 🎉");
+  const confirmOtp = async () => {
+    try {
+      await deliveryService.confirmDelivery(order.id, otp);
+      setDelivered(true);
+      setOtpOpen(false);
+      toast.success("Đã giao hàng thành công 🎉");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Mã OTP chưa đúng");
+    }
+  };
+
+  const reportIssue = async (reason: string) => {
+    try { await deliveryService.reportIssue(order.id, reason); }
+    catch { /* ignore */ }
+    setIssueOpen(false);
+    toast.success("Đã gửi báo cáo, tổng đài sẽ gọi bạn");
   };
 
   return (
