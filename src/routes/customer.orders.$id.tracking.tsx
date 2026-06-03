@@ -39,9 +39,9 @@ const etaByStatus: Record<Order["status"], string> = {
 };
 
 function Page() {
-  const initial = Route.useLoaderData();
+  const initial = Route.useLoaderData() as Order;
   const { data, refetch, cancel } = useOrder(initial.id);
-  const order = data ?? initial;
+  const order: Order = data ?? initial;
   const status = order.status;
   const [cancelOpen, setCancelOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
