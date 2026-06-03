@@ -81,7 +81,7 @@ registerMock("POST", "/products", async (_p, body) => {
     isAvailable: b.isAvailable ?? true,
     preparationOptions: b.preparationOptions ?? [],
   };
-  mockProducts.unshift(product);
+  (mockProducts as Product[]).unshift(product);
   return product;
 });
 
