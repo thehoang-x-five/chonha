@@ -144,7 +144,7 @@ function Page() {
               { label: "Không tìm thấy địa chỉ", desc: "Địa chỉ giao hàng không chính xác" },
               { label: "Sự cố khác", desc: "Mô tả với tổng đài" },
             ].map(i => (
-              <button key={i.label} onClick={() => { setIssueOpen(false); toast.success("Đã gửi báo cáo, tổng đài sẽ gọi bạn"); }} className="flex w-full items-start gap-3 rounded-2xl border p-3 text-left transition hover:bg-accent">
+              <button key={i.label} onClick={() => reportIssue(i.label)} className="flex w-full items-start gap-3 rounded-2xl border p-3 text-left transition hover:bg-accent">
                 <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
                 <div>
                   <p className="font-semibold">{i.label}</p>
