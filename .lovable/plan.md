@@ -1,106 +1,93 @@
 
-# Production-Ready Frontend Architecture for Chợ Nhà Mình
+# Complete Frontend Interactions — Chợ Nhà Mình
 
-Goal: keep the working prototype, but introduce a clean **types → mocks → services → hooks → UI** layering so the app is one swap away from a real backend. No real backend, payments, maps, or auth.
+Goal: make every button, toggle, filter and form across all four roles do something real (mock action / modal / navigation / toast), persist demo state in localStorage, and keep the existing **UI → hooks → services → mocks** architecture intact. No real backend, payments, maps or auth.
 
-## Scope reality check
+## 1. Foundations (do first)
 
-The codebase currently has ~40 route files, all of which import directly from `src/lib/mock-data.ts`. A literal "no UI file may import mock data" rewrite of every page in one pass is high-risk. The plan below builds the **full new architecture end-to-end**, migrates the **high-traffic flows** to it, and leaves the remaining pages working via a thin compatibility shim that re-exports from the new mocks layer — so even non-migrated pages stop touching the old `lib/mock-data` path and the rule holds project-wide.
+- **`src/lib/storage.ts`** — typed `loadJSON / saveJSON` wrappers with namespaced keys: `cnm.role`, `cnm.user`, `cnm.cart`, `cnm.followedStalls`, `cnm.orders`, `cnm.vendorProductAvailability`, `cnm.driverOnline`, `cnm.appSettings`, `cnm.addresses`, `cnm.vendorStall`, `cnm.driverProfile`. Each store has a default-seed + `reset()`.
+- **Seed bootstrap**: services hydrate their in-memory arrays from localStorage on first import; mutations call `save()`. This keeps refreshes from wiping demo progress.
+- **`src/lib/validators.ts`** — extend with `vnPhone`, `price`, `qty`, `address`, `otp`, `requiredText`, returning `{ ok, message }` with Vietnamese messages.
+- **Global toast contract**: helper `notifyTodo(label)` → `toast.info(`${label} sẽ được kết nối API ở phiên bản sau.`)` for not-yet-wired actions.
 
-## 1. New folder layout (additive — nothing deleted yet)
+## 2. Service-layer additions
 
-```text
-src/
-  types/         auth, user, market, stall, product, cart, order,
-                 delivery, payment, admin, notification  (.types.ts)
-  mocks/         mockMarkets, mockStalls, mockProducts, mockUsers,
-                 mockOrders, mockDrivers, mockPayments, mockNotifications
-  services/      apiClient, authService, marketService, stallService,
-                 productService, cartService, orderService,
-                 deliveryService, paymentService, adminService,
-                 notificationService
-  hooks/         useAuth, useMarkets, useStalls, useProducts, useCart,
-                 useOrders, useDelivery, useAdminDashboard,
-                 useNotifications
-  lib/           formatCurrency, formatDate, constants, permissions,
-                 validators  (keep existing utils.ts, cart-store.ts)
-  styles/        theme.ts  (tokens mirror existing styles.css)
-```
+Round out the existing services so every UI need has a method:
 
-`src/app/routes` and `src/components/{customer,vendor,driver,admin}` reorganization is **not** done — TanStack file-based routing requires routes at `src/routes/`, and moving components risks breaking every import. Components stay where they are; the *logical* grouping is documented in a short `src/components/README.md`.
+- `cartService`: `addToCart` (with cross-market guard returning `CROSS_MARKET` error), `forceReplaceCart`, `updateQty`, `removeItem`, `clearCart`, `applyVoucher`.
+- `orderService`: `createOrder`, `getOrdersByCustomer`, `getOrderById`, `cancelOrder`, `advanceStatus` (demo "next status" button), `reorder(orderId)` (returns items, applies cross-market rule).
+- `stallService`: `followStall / unfollowStall / isFollowed / listFollowed`, `setStallOpen`, `updateStall`, plus admin `approveStall / rejectStall / suspendStall`.
+- `productService`: `toggleAvailability`, `updatePrice`, `createProduct`, `updateProduct`, `deleteProduct`, `searchProducts`.
+- `deliveryService`: `getAvailableTripForDriver`, `declineTrip`, `confirmPickup(orderId, stallId)`, `advanceTripStatus`, `confirmDelivery(otp)` validates `"1234"`, `reportIssue(type)`.
+- `adminService`: `listMarkets / createMarket / updateMarket / toggleMarket / disableMarket`, `listStalls(filter)`, `listProducts`, `hideProduct`, `listOrders(filter)`, `forceStatus`, `assignDriver`, `refund`, `listDrivers`, `verifyDriver`, `suspendDriver`, `dispatch.listWaitingOrders`, `dispatch.listAvailableDrivers`, `dispatch.score(order, driver)` (mock: distance + workload + rating + vehicle), `recomputeMatches`, `getSettings / saveSettings`, `resetDemoData()`.
+- `authService`: `getCurrentUser`, `updateProfile`, `listAddresses / addAddress / updateAddress / deleteAddress`, `logout()` clears `cnm.role` + `cnm.user` and navigates to `/`.
 
-## 2. Types (TypeScript models)
+## 3. Hooks
 
-Each entity in the brief gets an interface in `src/types/*.types.ts`. Status enums become string-literal unions (`OrderStatus`, `PaymentStatus`, `UserRole`, etc.). A single `src/types/index.ts` re-exports everything.
+Add/extend: `useFavorites`, `useAddresses`, `useVendorOrders`, `useVendorProducts`, `useVendorStall`, `useDriverTrip`, `useAdminMarkets`, `useAdminStalls`, `useAdminProducts`, `useAdminOrders`, `useAdminDrivers`, `useDispatch`, `useAppSettings`. Each returns `{ data, loading, error, refetch, ...mutations }` and calls services only.
 
-## 3. Mocks layer
+## 4. Customer pages
 
-`src/mocks/*` becomes the **single source of truth** for seed data. Internally these files import the existing `src/lib/mock-data.ts` constants (markets, stalls, products, orders, drivers) and re-export them in typed form, plus add the new fixtures the brief requires (mock users, payments, notifications). After this step, `src/lib/mock-data.ts` is referenced **only by `src/mocks/*` and `src/services/*`** — UI components do not import it.
+- **home**: wire search input (debounced) against `productService.search + marketService.search + stallService.search`; category chips filter products; card links use `<Link>` with proper params.
+- **markets.$id**: stall category filter + in-market stall search; favorite toggle via `useFavorites`; "Chợ đang đóng cửa" banner when `market.isOpen === false`.
+- **stalls.$id**: product category filter; availability badge driven by `product.available`; follow/unfollow; call/message → `notifyTodo`.
+- **products.$id**: already mostly built — replace direct `cart.add` with `cartService.addToCart`; on `CROSS_MARKET` error open `<AlertDialog>` with the two options; note saved to local draft (`cnm.cartDraftNote`).
+- **cart**: qty +/-, remove, clear (confirm dialog), voucher input (`MOCK10` = 10% off), grouping by stall, disabled checkout when empty.
+- **checkout** (new route `customer.checkout.tsx`): address select from `useAddresses`, delivery note, time slot, payment method radios; Confirm → `orderService.createOrder` → `cartService.clearCart` → navigate to `/customer/orders/$id/tracking`.
+- **orders.$id.tracking**: status from service; "Mô phỏng bước tiếp theo" demo button calls `advanceStatus`; timeline + driver card + per-stall pickup checklist reactive; Cancel allowed when status ∈ {placed, accepted, preparing}; Support button opens modal.
+- **favorites**: list from `useFavorites`, remove, "Đặt lại" from last order, navigate.
+- **orders.index**: tab filtering already there; add "Đặt lại" button on completed orders calling `reorder`.
+- **profile**: edit form (name/phone/email) with validators; address CRUD; logout.
 
-## 4. Service layer + apiClient
+## 5. Vendor pages
 
-`src/services/apiClient.ts` exposes `get / post / put / patch / delete`, each returning `Promise<T>` with a simulated 150–400 ms delay and a clearly marked `// TODO: replace with real fetch(baseURL + path)` block.
+- **dashboard**: KPIs derived from `useVendorOrders`; urgent-order card links to detail; quick availability toggles call `productService.toggleAvailability`.
+- **orders**: status filter tabs; accept / reject (reason modal); call button toast; row → detail.
+- **orders.$id**: enforce workflow `accepted → preparing → ready_for_pickup → handed_to_driver`; disabled buttons outside current step; show notes, prep, replacement preference; "Báo hết hàng" modal selects an item and calls `productService.toggleAvailability(false)` + adds order note.
+- **products**: search/filter/toggle/quick-price modal/edit/delete/add (route `vendor.products.new.tsx`). Forms validated.
+- **revenue**: today/week/month filter computes from mock orders; chart via recharts; export → toast.
+- **profile** (My Stall): edit fields, open/close toggle, save via `stallService.updateStall`.
 
-Each service (`marketService`, `stallService`, `productService`, `cartService`, `orderService`, `deliveryService`, `paymentService`, `adminService`, `authService`, `notificationService`) exposes exactly the methods listed in the brief. Internally they read/write the `src/mocks/*` arrays so state changes (follow stall, add to cart, accept trip, approve stall, toggle availability) persist for the session. Errors are thrown as typed `ApiError` objects so hooks can surface them.
+## 6. Driver pages
 
-## 5. Hooks
+- **home**: online/offline switch persists; when online surfaces `getAvailableTripForDriver` mock; accept → `/driver/trips/$id`; decline hides + toast; map placeholder shows status text.
+- **trips.$id**: state machine `heading_to_market → picking_up → all_picked → delivering → delivered`; per-stall confirm buttons; "Đã lấy đủ hàng" enabled only when all stalls confirmed; call-stall toast; issue modal with 3 reasons; delivery step has call/chat toast + OTP input validating `1234` (validator message Vietnamese); on complete → success screen → back to home.
+- **trips**: history list from `deliveryService.listTrips(driverId)`, day/week/month filter, detail modal.
+- **earnings**: aggregate from mock trips.
+- **profile**: edit fields incl. vehicle, logout.
 
-Thin wrappers around services using local `useState` + `useEffect` (no TanStack Query introduction — would balloon scope). Each hook returns `{ data, loading, error, refetch, …mutations }`. The existing Zustand `cart-store.ts` is kept but `useCart` proxies through `cartService` so the API surface matches the brief.
+## 7. Admin pages
 
-## 6. Lib utilities
+- **dashboard**: KPIs + charts from `useAdminDashboard`; clicking a KPI navigates to filtered table via search params.
+- **markets**: search, add modal, edit modal, open/close toggle, disable confirm.
+- **stalls**: filters, approve/reject(reason)/suspend(reason), detail dialog.
+- **products** (new route `admin.products.tsx` already exists): search/filter/hide/unhide/detail dialog.
+- **orders**: filters, detail dialog, manual status with confirm, assign/reassign driver, refund mock action.
+- **drivers**: filters, verify, suspend(reason), detail dialog.
+- **dispatch**: waiting orders + available drivers + matching score (`0.4*distance + 0.25*workload + 0.2*rating + 0.15*vehicleFit`), per-card assign/reassign, "Mô phỏng matching" recomputes scores, empty state when no drivers.
+- **reports**: date range / market / stall filters drive chart data; export CSV → toast.
+- **settings**: form for delivery fee, service fee, commission, hotline, voucher; validators; save toast; **"Khôi phục dữ liệu demo"** button calls `resetDemoData()` then `window.location.reload()`.
 
-- `formatCurrency.ts` — wraps existing `formatVnd`.
-- `formatDate.ts` — Vietnamese-locale date/time helpers.
-- `constants.ts` — Vietnamese status labels (the full list from §6 of the brief), role labels, app config.
-- `permissions.ts` — `canAccessRole(currentRole, area)` helper.
-- `validators.ts` — phone, OTP, price validators.
+## 8. Cross-cutting
 
-## 7. Theme
+- **Mobile-friendly modals** use existing `Dialog`/`AlertDialog`/`Drawer` shadcn primitives.
+- **Page transitions** already provided by `MobileShell`'s `page-enter` keyed on route — unchanged.
+- **Vietnamese strings** sourced from `lib/constants.ts` (extend with any new statuses).
+- **No UI file imports `@/mocks/*` or `@/lib/mock-data`** — only through services/hooks. The compatibility shim stays only for currently-migrated legacy pages, and is removed from any page touched in this pass.
 
-`src/styles/theme.ts` exports a typed token object (colors, radius, shadow, spacing, font sizes, safe-area, nav heights, sidebar width) whose values mirror the CSS custom properties already in `src/styles.css`. No visual change — just a JS-accessible mirror so components can read tokens without hardcoding.
+## 9. Out of scope
 
-## 8. Role-based guard
-
-A new pathless layout `src/routes/_role.tsx` is **not** added (would require moving every route file and regenerating the route tree). Instead, a lightweight `<RoleGuard area="customer|vendor|driver|admin">` component is added inside each section's shell (`MobileShell` / `AdminShell`). It reads the current role from `useAuth()` (mock; defaults to whichever section the user clicked from the landing page and is persisted in localStorage), and on mismatch:
-- toasts `"Anh/chị chưa có quyền truy cập khu vực này."`
-- redirects to `/` (the role-picker landing page).
-
-## 9. Page migration (incremental, prioritized)
-
-Pages migrated to use **hooks + services only** (no `@/lib/mock-data` import) in this pass:
-
-- Customer: `home`, `markets.$id`, `stalls.$id`, `products.$id`, `cart`, `checkout`, `orders.index`, `orders.$id.tracking`, `favorites`, `profile`
-- Vendor: `dashboard`, `orders`, `orders.$id`, `products`
-- Driver: `home`, `trips`, `trips.$id`, `earnings`
-- Admin: `dashboard`, `orders`, `stalls`, `drivers`, `dispatch`, `markets`
-
-Pages left on the compatibility shim (still work, no UI change): `vendor.products.new`, `vendor.revenue`, `vendor.profile`, `driver.profile`, `admin.products`, `admin.reports`, `admin.settings`. These continue to import from `@/lib/mock-data` which now re-exports from `@/mocks/*`, so the architectural rule holds at the module-boundary level.
-
-## 10. Event-handler & state audit
-
-During migration of each prioritized page:
-- every button/switch/tab gets a handler;
-- not-yet-wired actions toast `"Tính năng này sẽ được kết nối API ở phiên bản sau."`;
-- async actions show loading state and success/error toast;
-- destructive actions (cancel order, reject stall, suspend driver, clear cart) get an `AlertDialog` confirmation;
-- empty/loading/error states added where missing.
-
-## 11. Vietnamese audit
-
-A pass over all migrated pages replaces any stray English labels with the Vietnamese strings from `lib/constants.ts`. Status badges are driven by the central `ORDER_STATUS_LABEL` map so labels stay consistent.
-
-## 12. Quality gate
-
-- App still builds with the existing Vite/TanStack pipeline.
-- All current routes still resolve.
-- `rg "from \"@/lib/mock-data\"" src/routes src/components` is reviewed — remaining hits are limited to the 7 pages on the compatibility shim and are documented in `src/components/README.md` as the next migration batch.
-
-## What is explicitly **not** in scope
-
-- Moving routes into `src/app/routes/` (would require regenerating the TanStack route tree and rewriting every link).
-- Re-bucketing components into `customer/ vendor/ driver/ admin/` subfolders (mass-rename risk; logical grouping documented instead).
-- Real auth, payments, maps, driver matching, or push notifications.
+- Real auth / payment / maps / push.
+- Real driver matching algorithm beyond the weighted mock score.
 - TanStack Query introduction.
-- Migrating the 7 lower-traffic pages off the compatibility shim (queued as follow-up).
+- Component re-bucketing into role folders or moving routes under `src/app/routes/`.
 
-If you'd like the full move into `src/app/routes/` and the component re-bucketing despite the breakage risk, say so and I'll do it as a dedicated follow-up pass.
+## Acceptance check
+
+Manual smoke run after build:
+1. Pick "Khách hàng" → search → add to cart → checkout → tracking → simulate next step until delivered.
+2. Switch to "Chủ sạp" → accept the order created above → advance to handed-to-driver.
+3. Switch to "Tài xế" → go online → accept trip → confirm each stall → deliver with OTP `1234`.
+4. Switch to "Quản trị" → see the completed order in dashboard, approve a pending stall, run "Mô phỏng matching" in dispatch, save settings, "Khôi phục dữ liệu demo".
+
+Given the breadth (≈40 route files + new services/hooks/storage), the work will land as several large parallel batches in a single pass; you should expect a long build with many file writes.
