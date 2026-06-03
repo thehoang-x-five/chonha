@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Star, Heart } from "lucide-react";
+import { Star } from "lucide-react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { CustomerBottomNav } from "@/components/bottom-nav";
 import { EmptyState } from "@/components/cards";
-import { stalls, getMarket } from "@/lib/mock-data";
+import { getMarket } from "@/lib/mock-data";
+import { useFavorites } from "@/hooks/useFavorites";
 import { toast } from "sonner";
+import { notifyTodo } from "@/lib/notify";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -14,13 +16,13 @@ import {
 export const Route = createFileRoute("/customer/favorites")({ component: Page });
 
 function Page() {
-  const [favorites, setFavorites] = useState(stalls.slice(0, 5));
+  const { data: favorites, unfollow, loading } = useFavorites();
   const [removeId, setRemoveId] = useState<string | null>(null);
   const target = favorites.find(s => s.id === removeId);
 
   return (
-    <MobileShell nav={<CustomerBottomNav />}>
-      <AppHeader title="Sạp quen" subtitle={`${favorites.length} sạp đã theo dõi`} />
+    <MobileShell nav={<CustomerBottomNav />} area="customer">
+      <AppHeader title="Sạp quen" subtitle={loading ? "Đang tải…" : `${favorites.length} sạp đã theo dõi`} />
       <div className="space-y-3 px-4 pt-3">
         {favorites.map(s => {
           const m = getMarket(s.marketId)!;
@@ -32,20 +34,20 @@ function Page() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold">{s.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{m.name} · {s.specialty}</p>
-                  <p className="mt-0.5 text-[11px] font-semibold"><Star className="mr-0.5 inline h-3 w-3 fill-warning text-warning" />{s.rating} · {s.yearsActive} năm kinh nghiệm</p>
+                  <p className="truncate text-xs text-muted-foreground">{m.name} · {s.description}</p>
+                  <p className="mt-0.5 text-[11px] font-semibold"><Star className="mr-0.5 inline h-3 w-3 fill-warning text-warning" />{s.rating} · {s.yearsInMarket} năm kinh nghiệm</p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 border-t bg-muted/30 p-2">
                 <Link to="/customer/stalls/$id" params={{ id: s.id }} className="rounded-full bg-primary py-2 text-center text-xs font-bold text-primary-foreground">Xem sản phẩm</Link>
-                <button onClick={() => toast.success(`Đã thêm đơn cũ từ ${s.name}`)} className="rounded-full bg-secondary py-2 text-xs font-bold text-secondary-foreground">Đặt lại</button>
+                <button onClick={() => notifyTodo("Đặt lại nhanh")} className="rounded-full bg-secondary py-2 text-xs font-bold text-secondary-foreground">Đặt lại</button>
                 <button onClick={() => setRemoveId(s.id)} className="rounded-full border bg-card py-2 text-xs font-bold">Bỏ theo dõi</button>
               </div>
             </div>
           );
         })}
 
-        {favorites.length === 0 && (
+        {!loading && favorites.length === 0 && (
           <EmptyState
             emoji="💚"
             title="Chưa có sạp quen nào"
@@ -63,7 +65,7 @@ function Page() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Giữ theo dõi</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setFavorites(favorites.filter(f => f.id !== removeId)); toast.success("Đã bỏ theo dõi sạp"); setRemoveId(null); }}>Bỏ theo dõi</AlertDialogAction>
+            <AlertDialogAction onClick={async () => { if (removeId) { await unfollow(removeId); toast.success("Đã bỏ theo dõi sạp"); } setRemoveId(null); }}>Bỏ theo dõi</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

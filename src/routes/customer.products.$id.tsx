@@ -3,8 +3,12 @@ import { useState } from "react";
 import { Minus, Plus, Sparkles } from "lucide-react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { getProduct, getStall, formatVnd } from "@/lib/mock-data";
-import { cart } from "@/lib/cart-store";
+import { cartService } from "@/services/cartService";
+import { ApiError } from "@/services/apiClient";
+import { validateQty } from "@/lib/validators";
+import { loadJSON, saveJSON, STORAGE_KEYS } from "@/lib/storage";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/customer/products/$id")({
   component: Page,
@@ -30,19 +34,35 @@ function Page() {
   const [custom, setCustom] = useState(false);
   const [prep, setPrep] = useState(product.prepOptions?.[0]);
   const [replace, setReplace] = useState("auto");
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(() => loadJSON<string>(STORAGE_KEYS.cartDraftNote, ""));
+  const [crossMarket, setCrossMarket] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const total = product.price * qty;
 
-  const add = () => {
-    const r = cart.add({ productId: product.id, stallId: product.stallId, marketId: stall.marketId, qty, prep, note, replacement: replace });
-    if (!r.ok) { toast.error(r.reason!); return; }
-    toast.success(`Đã thêm ${product.name} vào giỏ`);
-    nav({ to: "/customer/cart" });
+  const doAdd = async (force = false) => {
+    const v = validateQty(qty);
+    if (!v.ok) { toast.error(v.message); return; }
+    setBusy(true);
+    try {
+      if (force) await cartService.clearCart();
+      await cartService.addToCart(product.id, qty, prep, note);
+      saveJSON(STORAGE_KEYS.cartDraftNote, note);
+      toast.success(`Đã thêm ${product.name} vào giỏ`);
+      nav({ to: "/customer/cart" });
+    } catch (e) {
+      if (e instanceof ApiError && e.code === "DIFFERENT_MARKET") {
+        setCrossMarket(true);
+      } else {
+        toast.error(e instanceof Error ? e.message : "Không thêm được vào giỏ");
+      }
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <MobileShell padBottom={false}>
+    <MobileShell padBottom={false} area="customer">
       <AppHeader title={product.name} back={true} />
       <div className="grid aspect-square place-items-center bg-gradient-to-br from-accent to-muted text-[8rem]">{product.image}</div>
       <div className="px-4 pt-4 pb-32">
@@ -51,6 +71,11 @@ function Page() {
         {product.freshNote && (
           <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-medium text-success">
             <Sparkles className="h-3 w-3" /> {product.freshNote}
+          </p>
+        )}
+        {!product.isAvailable && (
+          <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2.5 py-1 text-xs font-medium text-destructive">
+            Tạm hết hàng – chỉ có thể đặt khi sạp báo còn hàng lại
           </p>
         )}
         <p className="mt-3 text-sm text-muted-foreground">Bán tại <span className="font-semibold text-foreground">{stall.name}</span></p>
@@ -72,7 +97,7 @@ function Page() {
           )}
         </section>
 
-        {product.prepOptions && (
+        {product.prepOptions && product.prepOptions.length > 0 && (
           <section className="mt-5">
             <h3 className="text-sm font-semibold">Cách sơ chế</h3>
             <div className="mt-2 grid grid-cols-2 gap-2">
@@ -97,16 +122,34 @@ function Page() {
 
         <section className="mt-5">
           <h3 className="text-sm font-semibold">Ghi chú cho sạp</h3>
-          <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Ví dụ: chọn cá vừa, cắt 4 khúc" rows={3} className="mt-2 w-full rounded-2xl border bg-card p-3 text-sm outline-none focus:border-primary" />
+          <textarea value={note} onChange={e => { setNote(e.target.value); saveJSON(STORAGE_KEYS.cartDraftNote, e.target.value); }} placeholder="Ví dụ: chọn cá vừa, cắt 4 khúc" rows={3} className="mt-2 w-full rounded-2xl border bg-card p-3 text-sm outline-none focus:border-primary" />
         </section>
       </div>
 
       <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2 border-t bg-card p-3 safe-bottom">
-        <button onClick={add} className="flex h-14 w-full items-center justify-between rounded-2xl bg-primary px-5 text-base font-bold text-primary-foreground active:scale-[0.98]">
-          <span>Thêm vào giỏ</span>
+        <button onClick={() => doAdd(false)} disabled={busy || !product.isAvailable} className="flex h-14 w-full items-center justify-between rounded-2xl bg-primary px-5 text-base font-bold text-primary-foreground active:scale-[0.98] disabled:opacity-50">
+          <span>{busy ? "Đang thêm…" : "Thêm vào giỏ"}</span>
           <span>{formatVnd(total)}</span>
         </button>
       </div>
+
+      <AlertDialog open={crossMarket} onOpenChange={setCrossMarket}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Giỏ đang có món ở chợ khác</AlertDialogTitle>
+            <AlertDialogDescription>
+              Mỗi đơn chỉ hỗ trợ mua trong cùng một chợ để giao hàng nhanh và giữ độ tươi.
+              Bạn muốn xoá giỏ hiện tại và thêm món mới này?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Giữ giỏ hiện tại</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setCrossMarket(false); doAdd(true); }}>
+              Xoá giỏ hiện tại và thêm món mới
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileShell>
   );
 }
