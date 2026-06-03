@@ -120,6 +120,38 @@ function Page() {
                     <div className="mt-2 flex justify-between border-t pt-2 font-bold"><span>Tổng cộng</span><span className="text-primary">{formatVnd(detail.total)}</span></div>
                   </div>
                 </div>
+                <DialogFooter className="flex-col gap-2 sm:flex-row">
+                  <select
+                    defaultValue=""
+                    onChange={async (e) => {
+                      const id = e.target.value;
+                      if (!id) return;
+                      try {
+                        await adminService.assignDriver(detail.id, id);
+                        const dr = drivers.find((x) => x.id === id);
+                        toast.success(`Đã gán ${dr?.name ?? "tài xế"} cho đơn ${detail.code}`);
+                        setDetail({ ...detail, driverId: id });
+                      } catch (err) { toast.error(err instanceof Error ? err.message : "Gán tài xế thất bại"); }
+                    }}
+                    className="h-10 rounded-xl border bg-card px-3 text-sm"
+                  >
+                    <option value="">{detail.driverId ? "Gán tài xế khác" : "Gán tài xế"}…</option>
+                    {drivers.filter((d) => d.isOnline).map((d) => (
+                      <option key={d.id} value={d.id}>{d.name} · {d.vehicle}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await adminService.refund(detail.id);
+                        toast.success(`Đã hoàn tiền đơn ${detail.code} (mô phỏng)`);
+                        setDetail({ ...detail, paymentStatus: "refunded" });
+                      } catch (err) { toast.error(err instanceof Error ? err.message : "Hoàn tiền thất bại"); }
+                    }}
+                    disabled={detail.paymentStatus === "refunded"}
+                    className="inline-flex items-center justify-center gap-1 rounded-xl border-2 border-destructive/30 bg-destructive/5 px-4 py-2 text-sm font-bold text-destructive disabled:opacity-50"
+                  ><Undo2 className="h-4 w-4" /> {detail.paymentStatus === "refunded" ? "Đã hoàn tiền" : "Hoàn tiền"}</button>
+                </DialogFooter>
               </>
             );
           })()}
