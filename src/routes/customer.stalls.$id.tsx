@@ -39,8 +39,12 @@ function Page() {
   };
 
   return (
-    <MobileShell nav={<CustomerBottomNav />}>
-      <AppHeader title={stall.name} back={`/customer/markets/${stall.marketId}` as any} right={<button className="tap-target grid place-items-center"><Heart className="h-5 w-5" /></button>} />
+    <MobileShell nav={<CustomerBottomNav />} area="customer">
+      <AppHeader title={stall.name} back={`/customer/markets/${stall.marketId}` as any} right={
+        <button onClick={toggleFollow} aria-label={following ? "Bỏ theo dõi" : "Theo dõi"} className="tap-target grid place-items-center">
+          <Heart className={`h-5 w-5 ${following ? "fill-destructive text-destructive" : ""}`} />
+        </button>
+      } />
 
       <div className="grid h-44 place-items-center bg-gradient-to-br from-secondary/20 to-primary/15 text-7xl">{stall.cover}</div>
 
@@ -54,9 +58,11 @@ function Page() {
         </div>
 
         <div className="mt-3 flex items-center gap-2">
-          <button className="flex-1 rounded-2xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground">Theo dõi sạp</button>
-          <button className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><Phone className="h-4 w-4" /></button>
-          <button className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><MessageCircle className="h-4 w-4" /></button>
+          <button onClick={toggleFollow} className={`flex-1 rounded-2xl px-3 py-2.5 text-sm font-semibold ${following ? "border bg-card" : "bg-primary text-primary-foreground"}`}>
+            {following ? "Đang theo dõi" : "Theo dõi sạp"}
+          </button>
+          <button onClick={() => notifyTodo("Gọi điện sạp")} className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><Phone className="h-4 w-4" /></button>
+          <button onClick={() => notifyTodo("Nhắn tin sạp")} className="tap-target grid place-items-center rounded-2xl border bg-card px-3"><MessageCircle className="h-4 w-4" /></button>
         </div>
 
         <div className="mt-3 flex items-center gap-3 text-xs">
