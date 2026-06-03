@@ -1,32 +1,64 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { DriverBottomNav } from "@/components/bottom-nav";
 import { MapPlaceholder, KPIStatCard } from "@/components/cards";
-import { formatVnd } from "@/lib/mock-data";
-import { Zap, MapPin, Navigation, Package, Star, TrendingUp } from "lucide-react";
+import { formatVnd, getMarket } from "@/lib/mock-data";
+import { Zap, MapPin, Navigation, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { deliveryService } from "@/services/deliveryService";
+import { loadJSON, saveJSON, STORAGE_KEYS } from "@/lib/storage";
+import type { Order } from "@/types/order.types";
 
 export const Route = createFileRoute("/driver/home")({ component: Page });
 
-function Page() {
-  const [online, setOnline] = useState(true);
-  const [incoming, setIncoming] = useState(false);
-  const [countdown, setCountdown] = useState(15);
+const DRIVER_ID = "d1";
 
-  // Simulate incoming order after going online
+function Page() {
+  const [online, setOnline] = useState<boolean>(() => loadJSON<boolean>(STORAGE_KEYS.driverOnline, true));
+  const [incoming, setIncoming] = useState<Order | null>(null);
+  const [countdown, setCountdown] = useState(15);
+  const [busy, setBusy] = useState(false);
+  const nav = useNavigate();
+
+  useEffect(() => { saveJSON(STORAGE_KEYS.driverOnline, online); }, [online]);
+
   useEffect(() => {
-    if (!online) { setIncoming(false); return; }
-    const t = setTimeout(() => setIncoming(true), 1500);
+    if (!online) { setIncoming(null); return; }
+    const t = setTimeout(async () => {
+      try { const o = await deliveryService.getAvailableTripForDriver(DRIVER_ID); setIncoming(o); }
+      catch { /* ignore */ }
+    }, 1200);
     return () => clearTimeout(t);
   }, [online]);
 
   useEffect(() => {
     if (!incoming) { setCountdown(15); return; }
-    if (countdown <= 0) { setIncoming(false); toast.error("Đã bỏ lỡ cuốc giao"); return; }
-    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    if (countdown <= 0) { setIncoming(null); toast.error("Đã bỏ lỡ cuốc giao"); return; }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [incoming, countdown]);
+
+  const accept = async () => {
+    if (!incoming) return;
+    setBusy(true);
+    try {
+      await deliveryService.acceptTrip(DRIVER_ID, incoming.id);
+      toast.success("Đã nhận cuốc, bắt đầu đi đến chợ");
+      const id = incoming.id;
+      setIncoming(null);
+      nav({ to: "/driver/trips/$id", params: { id } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Không nhận được cuốc");
+    } finally { setBusy(false); }
+  };
+
+  const decline = async () => {
+    if (!incoming) return;
+    try { await deliveryService.declineTrip(incoming.id, DRIVER_ID); } catch { /* ignore */ }
+    toast("Đã bỏ qua cuốc");
+    setIncoming(null);
+  };
 
   return (
     <MobileShell nav={<DriverBottomNav />}>
