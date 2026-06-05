@@ -33,7 +33,7 @@ function Page() {
 
       <div className="mx-4 mt-2 overflow-hidden rounded-2xl border bg-card">
         {items.map((it, i) => (
-          <button key={i} className={`tap-target flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t" : ""}`}>
+          <button key={i} onClick={() => notifyTodo(it.label)} className={`tap-target flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t" : ""}`}>
             <it.icon className="h-5 w-5 text-primary" />
             <span className="flex-1 text-sm font-medium">{it.label}</span>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -42,9 +42,7 @@ function Page() {
       </div>
 
       <div className="m-4">
-        <Link to="/" className="flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-semibold text-destructive">
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Link>
+        <LogoutButton />
       </div>
     </MobileShell>
   );
