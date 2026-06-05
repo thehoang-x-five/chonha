@@ -25,9 +25,7 @@ function Page() {
       </div>
 
       <div className="m-4">
-        <Link to="/" className="flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-semibold text-destructive">
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Link>
+        <LogoutButton />
       </div>
     </MobileShell>
   );
