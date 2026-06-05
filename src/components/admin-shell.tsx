@@ -46,7 +46,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
           </div>
           <nav className="p-2">
             {items.map(({ to, label, icon: Icon }) => {
-              const active = path === to;
+              const active = path === to || path.startsWith(to + "/");
               return (
                 <Link key={to} to={to} onClick={() => setOpen(false)} className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? "bg-primary text-primary-foreground shadow-sm" : "text-sidebar-foreground hover:bg-sidebar-accent"}`}>
                   <Icon className="h-4 w-4" /> {label}
