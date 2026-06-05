@@ -1,13 +1,19 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Store, ClipboardList, ShoppingBasket, User } from "lucide-react";
-import { useCart } from "@/lib/cart-store";
+import { useCart } from "@/hooks/useCart";
 
-const items: { to: string; label: string; icon: any; badge?: boolean }[] = [
-  { to: "/customer/home", label: "Trang chủ", icon: Home },
-  { to: "/customer/favorites", label: "Sạp quen", icon: Store },
-  { to: "/customer/orders", label: "Đơn hàng", icon: ClipboardList },
-  { to: "/customer/cart", label: "Giỏ hàng", icon: ShoppingBasket, badge: true },
-  { to: "/customer/profile", label: "Tài khoản", icon: User },
+const isActive = (path: string, to: string, prefixes: string[] = []) => {
+  if (path === to) return true;
+  // Treat the section as active when on any sub-route declared in prefixes.
+  return prefixes.some((p) => path === p || path.startsWith(p + "/"));
+};
+
+const items: { to: string; label: string; icon: any; badge?: boolean; prefixes?: string[] }[] = [
+  { to: "/customer/home", label: "Trang chủ", icon: Home, prefixes: ["/customer/home", "/customer/markets", "/customer/stalls", "/customer/products"] },
+  { to: "/customer/favorites", label: "Sạp quen", icon: Store, prefixes: ["/customer/favorites"] },
+  { to: "/customer/orders", label: "Đơn hàng", icon: ClipboardList, prefixes: ["/customer/orders"] },
+  { to: "/customer/cart", label: "Giỏ hàng", icon: ShoppingBasket, badge: true, prefixes: ["/customer/cart", "/customer/checkout"] },
+  { to: "/customer/profile", label: "Tài khoản", icon: User, prefixes: ["/customer/profile"] },
 ];
 
 export function CustomerBottomNav() {
@@ -16,8 +22,8 @@ export function CustomerBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur safe-bottom">
       <ul className="mx-auto grid max-w-md grid-cols-5">
-        {items.map(({ to, label, icon: Icon, badge }) => {
-          const active = path === to;
+        {items.map(({ to, label, icon: Icon, badge, prefixes }) => {
+          const active = isActive(path, to, prefixes);
           return (
             <li key={to}>
               <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>
@@ -51,7 +57,7 @@ export function VendorBottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 bg-card/95 backdrop-blur safe-bottom">
       <ul className="mx-auto grid max-w-md grid-cols-5">
         {vendorItems.map(({ to, label, icon: Icon }) => {
-          const active = path === to;
+          const active = isActive(path, to, [to]);
           return (
             <li key={to}>
               <Link to={to as any} className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[13px] font-bold ${active ? "text-primary" : "text-muted-foreground"}`}>
@@ -79,7 +85,7 @@ export function DriverBottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur safe-bottom">
       <ul className="mx-auto grid max-w-md grid-cols-4">
         {driverItems.map(({ to, label, icon: Icon }) => {
-          const active = path === to;
+          const active = isActive(path, to, [to]);
           return (
             <li key={to}>
               <Link to={to as any} className={`tap-target flex flex-col items-center justify-center gap-1 py-2 text-xs font-medium ${active ? "text-primary" : "text-muted-foreground"}`}>

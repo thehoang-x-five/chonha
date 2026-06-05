@@ -20,7 +20,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
   const [open, setOpen] = useState(false);
   return (
     <RoleGuard area="admin">
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-dvh bg-muted/30">
       {/* Mobile top */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-card px-3 lg:hidden">
         <button onClick={() => setOpen(true)} className="tap-target -ml-2 grid place-items-center"><Menu className="h-5 w-5" /></button>
@@ -33,7 +33,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-sidebar transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-sidebar transition-transform lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="flex h-16 items-center justify-between gap-2 border-b px-4">
             <Link to="/admin/dashboard" className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-secondary text-lg">🧺</div>
@@ -46,7 +46,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
           </div>
           <nav className="p-2">
             {items.map(({ to, label, icon: Icon }) => {
-              const active = path === to;
+              const active = path === to || path.startsWith(to + "/");
               return (
                 <Link key={to} to={to} onClick={() => setOpen(false)} className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? "bg-primary text-primary-foreground shadow-sm" : "text-sidebar-foreground hover:bg-sidebar-accent"}`}>
                   <Icon className="h-4 w-4" /> {label}

@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { VendorBottomNav } from "@/components/bottom-nav";
-import { Star, MapPin, Clock, Pencil, HelpCircle, LogOut } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
+import { notifyTodo } from "@/lib/notify";
+import { Star, MapPin, Clock, Pencil, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/vendor/profile")({ component: Page });
 
@@ -27,13 +29,13 @@ function Page() {
         </ul>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground"><Pencil className="h-4 w-4" />Sửa gian hàng</button>
-          <button className="flex items-center justify-center gap-2 rounded-2xl border bg-card py-4 text-base font-bold"><HelpCircle className="h-4 w-4" />Trợ giúp</button>
+          <button onClick={() => notifyTodo("Sửa gian hàng")} className="flex items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground"><Pencil className="h-4 w-4" />Sửa gian hàng</button>
+          <button onClick={() => notifyTodo("Trợ giúp")} className="flex items-center justify-center gap-2 rounded-2xl border bg-card py-4 text-base font-bold"><HelpCircle className="h-4 w-4" />Trợ giúp</button>
         </div>
 
-        <Link to="/" className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-semibold text-destructive">
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Link>
+        <div className="mt-3">
+          <LogoutButton />
+        </div>
       </div>
     </MobileShell>
   );

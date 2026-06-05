@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { DriverBottomNav } from "@/components/bottom-nav";
-import { Star, ShieldCheck, FileCheck, Bike, HelpCircle, LogOut } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
+import { Star, ShieldCheck, FileCheck, Bike, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/driver/profile")({ component: Page });
 
@@ -24,9 +25,7 @@ function Page() {
       </div>
 
       <div className="m-4">
-        <Link to="/" className="flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-semibold text-destructive">
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Link>
+        <LogoutButton />
       </div>
     </MobileShell>
   );

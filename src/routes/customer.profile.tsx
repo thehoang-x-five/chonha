@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { CustomerBottomNav } from "@/components/bottom-nav";
-import { User, MapPin, Ticket, CreditCard, HelpCircle, LogOut, ChevronRight, Heart } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
+import { notifyTodo } from "@/lib/notify";
+import { User, MapPin, Ticket, CreditCard, HelpCircle, ChevronRight, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/customer/profile")({ component: Page });
 
@@ -31,7 +33,7 @@ function Page() {
 
       <div className="mx-4 mt-2 overflow-hidden rounded-2xl border bg-card">
         {items.map((it, i) => (
-          <button key={i} className={`tap-target flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t" : ""}`}>
+          <button key={i} onClick={() => notifyTodo(it.label)} className={`tap-target flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t" : ""}`}>
             <it.icon className="h-5 w-5 text-primary" />
             <span className="flex-1 text-sm font-medium">{it.label}</span>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -40,9 +42,7 @@ function Page() {
       </div>
 
       <div className="m-4">
-        <Link to="/" className="flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-semibold text-destructive">
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Link>
+        <LogoutButton />
       </div>
     </MobileShell>
   );
