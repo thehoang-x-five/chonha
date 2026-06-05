@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { CustomerBottomNav } from "@/components/bottom-nav";
-import { User, MapPin, Ticket, CreditCard, HelpCircle, LogOut, ChevronRight, Heart } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
+import { notifyTodo } from "@/lib/notify";
+import { User, MapPin, Ticket, CreditCard, HelpCircle, ChevronRight, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/customer/profile")({ component: Page });
 
