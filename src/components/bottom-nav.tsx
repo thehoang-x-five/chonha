@@ -57,7 +57,7 @@ export function VendorBottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 bg-card/95 backdrop-blur safe-bottom">
       <ul className="mx-auto grid max-w-md grid-cols-5">
         {vendorItems.map(({ to, label, icon: Icon }) => {
-          const active = path === to;
+          const active = isActive(path, to, [to]);
           return (
             <li key={to}>
               <Link to={to as any} className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[13px] font-bold ${active ? "text-primary" : "text-muted-foreground"}`}>
