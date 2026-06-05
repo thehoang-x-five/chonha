@@ -34,7 +34,7 @@ function Welcome() {
     navigate({ to });
   };
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-gradient-to-b from-accent/40 via-background to-background safe-top">
+    <div className="mx-auto min-h-dvh max-w-md bg-gradient-to-b from-accent/40 via-background to-background safe-top">
       <div className="px-6 pt-10">
         <div className="flex items-center gap-3">
           <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-2xl text-primary-foreground shadow-lg shadow-primary/30">🧺</div>

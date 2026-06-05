@@ -20,7 +20,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
   const [open, setOpen] = useState(false);
   return (
     <RoleGuard area="admin">
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-dvh bg-muted/30">
       {/* Mobile top */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-card px-3 lg:hidden">
         <button onClick={() => setOpen(true)} className="tap-target -ml-2 grid place-items-center"><Menu className="h-5 w-5" /></button>
@@ -33,7 +33,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-sidebar transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-sidebar transition-transform lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="flex h-16 items-center justify-between gap-2 border-b px-4">
             <Link to="/admin/dashboard" className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-secondary text-lg">🧺</div>
