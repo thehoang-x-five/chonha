@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader, MobileShell } from "@/components/app-shell";
 import { DriverBottomNav } from "@/components/bottom-nav";
-import { Star, ShieldCheck, FileCheck, Bike, HelpCircle, LogOut } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
+import { Star, ShieldCheck, FileCheck, Bike, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/driver/profile")({ component: Page });
 
