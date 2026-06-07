@@ -9,3 +9,4 @@ export * from "./delivery.types";
 export * from "./payment.types";
 export * from "./admin.types";
 export * from "./notification.types";
+export * from "./voucher.types";

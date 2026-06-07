@@ -34,10 +34,14 @@ function Page() {
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
-          <button className="tap-target relative grid place-items-center rounded-full bg-card shadow-md">
+          <Link
+            to="/customer/notifications"
+            aria-label="Thông báo"
+            className="tap-target relative grid place-items-center rounded-full bg-card shadow-md"
+          >
             <Bell className="h-5 w-5" />
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-secondary ring-2 ring-card" />
-          </button>
+          </Link>
         </div>
 
         <div className="relative mt-3 flex items-center gap-2 text-sm">
@@ -48,7 +52,7 @@ function Page() {
           </div>
         </div>
 
-        <Link to="/customer/home" className="relative mt-4 flex h-12 items-center gap-2 rounded-2xl bg-card px-4 shadow-md ring-1 ring-border">
+        <Link to="/customer/search" className="relative mt-4 flex h-12 items-center gap-2 rounded-2xl bg-card px-4 shadow-md ring-1 ring-border">
           <Search className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Tìm cá thu, rau muống, sạp Cô Lan…</span>
         </Link>

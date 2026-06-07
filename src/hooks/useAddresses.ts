@@ -23,6 +23,7 @@ export function useAddresses() {
     add: async (a: Omit<SavedAddress, "id">) => { const r = await authService.addAddress(a); refetch(); return r; },
     update: async (id: string, p: Partial<SavedAddress>) => { const r = await authService.updateAddress(id, p); refetch(); return r; },
     remove: async (id: string) => { await authService.deleteAddress(id); refetch(); },
+    setDefault: async (id: string) => { const r = await authService.updateAddress(id, { isDefault: true }); refetch(); return r; },
     defaultAddress: data.find((a) => a.isDefault) ?? data[0] ?? null,
   };
 }

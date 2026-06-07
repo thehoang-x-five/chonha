@@ -80,6 +80,7 @@ registerMock("POST", "/admin/stalls/:id/suspend", async (p) => {
 });
 
 export const stallService = {
+  getAllStalls: async (): Promise<Stall[]> => mockStalls.map((s) => ({ ...s, isFollowed: readFollowed().includes(s.id) })),
   getStallsByMarket: (marketId: string) => apiClient.get<Stall[]>(`/markets/${marketId}/stalls`),
   getStallById: (stallId: string) => apiClient.get<Stall>(`/stalls/${stallId}`),
   followStall: (stallId: string) => apiClient.post<Stall>(`/stalls/${stallId}/follow`),

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Store, ShoppingBag, Package, ClipboardList, Users, Route as RouteIcon, BarChart3, Settings, Menu, X, Search, Bell, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Store, ShoppingBag, Package, ClipboardList, Users, Route as RouteIcon, BarChart3, Settings, Menu, X, Search, Bell, ChevronDown, Ticket, LifeBuoy, UsersRound } from "lucide-react";
 import { useState } from "react";
 import { RoleGuard } from "@/components/common/RoleGuard";
 
@@ -11,6 +11,10 @@ const items = [
   { to: "/admin/orders", label: "Đơn hàng", icon: ClipboardList },
   { to: "/admin/drivers", label: "Tài xế", icon: Users },
   { to: "/admin/dispatch", label: "Điều phối", icon: RouteIcon },
+  { to: "/admin/users", label: "Người dùng", icon: UsersRound },
+  { to: "/admin/vouchers", label: "Khuyến mãi", icon: Ticket },
+  { to: "/admin/notifications", label: "Thông báo", icon: Bell },
+  { to: "/admin/tickets", label: "Phiếu hỗ trợ", icon: LifeBuoy },
   { to: "/admin/reports", label: "Báo cáo", icon: BarChart3 },
   { to: "/admin/settings", label: "Cấu hình", icon: Settings },
 ] as const;
