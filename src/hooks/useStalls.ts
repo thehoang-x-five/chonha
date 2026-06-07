@@ -2,6 +2,17 @@ import { useEffect, useState, useCallback } from "react";
 import { stallService } from "@/services/stallService";
 import type { Stall } from "@/types/stall.types";
 
+export function useStalls() {
+  const [data, setData] = useState<Stall[]>([]);
+  const [loading, setLoading] = useState(true);
+  const refetch = useCallback(() => {
+    setLoading(true);
+    stallService.getAllStalls().then(setData).finally(() => setLoading(false));
+  }, []);
+  useEffect(refetch, [refetch]);
+  return { data, loading, refetch };
+}
+
 export function useStallsByMarket(marketId: string | undefined) {
   const [data, setData] = useState<Stall[]>([]);
   const [loading, setLoading] = useState(true);
